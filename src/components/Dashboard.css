@@ -93,3 +93,13 @@ button:hover {
   font-weight: 500;
 }
 
+
+@media (max-width: 600px) {
+  table {
+    font-size: 12px;
+    overflow-x: auto;
+    display: block;
+  }
+  /* Add more styles for buttons and other elements if needed */
+}
+
