@@ -96,10 +96,15 @@ button:hover {
 
 @media (max-width: 600px) {
   table {
+    width: 100%;
     font-size: 12px;
     overflow-x: auto;
     display: block;
   }
-  /* Add more styles for buttons and other elements if needed */
+  th, td {
+    padding: 8px 4px;
+    word-break: break-word;
+  }
+  /* Consider hiding some columns with display: none */
 }
 
