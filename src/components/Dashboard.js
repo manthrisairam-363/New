@@ -126,6 +126,7 @@ export default function Dashboard() {
       }
     };
     fetchAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getCurrentMonth = () => config?.currentMonth || 1;
