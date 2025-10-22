@@ -1,76 +1,147 @@
+/* --- Base Layout --- */
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #f0f2f5;
+  margin: 0;
+  color: #333;
+}
+
 .dashboard {
-  text-align: center;
-  margin: 30px;
+  max-width: 1200px;
+  margin: 40px auto;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+  padding: 30px;
 }
 
+/* --- Title --- */
+h2 {
+  text-align: center;
+  color: #222;
+  margin-bottom: 25px;
+  font-weight: 600;
+}
+
+/* --- Summary Section --- */
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #007bff, #00c6ff);
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 1.05em;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.summary div {
+  flex: 1 1 250px;
+  margin: 10px;
+}
+
+/* --- Table Styling --- */
 table {
-  margin: auto;
+  width: 100%;
   border-collapse: collapse;
-  width: 80%;
-  font-size: 16px;
+  margin-top: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
 }
 
-th, td {
-  border: 1px solid #ccc;
-  padding: 8px 12px;
+th {
+  background-color: #007bff;
+  color: white;
+  padding: 12px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
   text-align: center;
 }
 
+tr:hover {
+  background-color: #f9f9f9;
+  transition: 0.3s;
+}
+
+/* --- Buttons --- */
 button {
   background-color: #007bff;
   color: white;
   border: none;
-  padding: 5px 10px;
+  padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
+  font-weight: 500;
+  transition: 0.3s;
 }
 
 button:hover {
   background-color: #0056b3;
+  transform: translateY(-1px);
 }
 
+/* --- Status Colors --- */
 .unpaid {
   background-color: #ffeaea;
-  color: #a10000;
+  color: #b30000;
 }
 
 .paid {
-  background-color: #e8ffe8;
-  color: #006400;
+  background-color: #e6ffe9;
+  color: #007a00;
 }
 
 .receiver {
   background-color: #fff8e1;
-  font-weight: bold;
+  font-weight: 600;
+  color: #c47f00;
 }
 
+/* --- Previous Dues --- */
 .prev-due {
-  background-color: #fff4b3 !important; /* light yellow, adjust as you like */
+  background-color: #fff4b3 !important;
   color: #a10000 !important;
   font-weight: bold;
 }
 
 .due-badge {
   display: inline-block;
-  background-color: #d20000;
-  color: #fff;
-  font-size: 0.9em;
-  font-weight: bold;
-  padding: 2px 8px;
-  border-radius: 10px;
-  margin-left: 8px;
-  letter-spacing: 1px;
+  background-color: #e60000;
+  color: white;
+  font-size: 0.8em;
+  padding: 3px 8px;
+  border-radius: 8px;
+  margin-left: 5px;
 }
 
+/* --- Voice Button --- */
 .voice-btn {
-  margin-bottom: 20px;
+  display: inline-block;
   background-color: #28a745;
   color: white;
   border: none;
-  padding: 10px 16px;
+  padding: 10px 20px;
   border-radius: 8px;
   font-size: 16px;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  margin-bottom: 15px;
+}
+
+.voice-btn:hover {
+  background-color: #218838;
 }
 
 .voice-btn.active {
@@ -79,33 +150,37 @@ button:hover {
 
 .voice-text {
   font-style: italic;
-  color: #333;
+  color: #444;
   margin-bottom: 15px;
 }
-.summary {
-  background: #f5f5f5;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: space-around;
-  font-size: 1.1em;
-  font-weight: 500;
+
+/* --- Receiver History Title --- */
+h3 {
+  margin-top: 40px;
+  text-align: center;
+  color: #333;
+  font-weight: 600;
+  border-bottom: 2px solid #007bff;
+  display: inline-block;
+  padding-bottom: 5px;
 }
 
-@media (max-width: 600px) {
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .summary {
+    flex-direction: column;
+  }
+
   table {
     width: 100%;
-    font-size: 12px;
-    overflow-x: auto;
-    display: block;
+    font-size: 14px;
   }
+
   th, td {
-    padding: 8px 4px;
-    word-break: break-word;
+    padding: 8px 5px;
   }
-  th:nth-child(6), td:nth-child(6), th:nth-child(7), td:nth-child(7) {
-    display: none;
+
+  .voice-btn {
+    width: 100%;
   }
 }
-
