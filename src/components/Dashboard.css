@@ -22,22 +22,26 @@ body {
 
 /* Summary section */
 .summary {
-  background: linear-gradient(135deg, #f5f5f5 0%, #e8f4fd 100%);
+  background: linear-gradient(135deg, #e8f4fd 0%, #d0eaff 100%);
   padding: 20px;
   border-radius: 12px;
   margin-bottom: 25px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-around;
   align-items: center;
   font-size: 1.1em;
   font-weight: 500;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  gap: 10px;
+  box-shadow: 0 2px 10px rgba(0, 123, 255, 0.1);
+  gap: 15px;
 }
 
 .summary > div {
-  flex: 1;
+  flex: 1 1 200px;
   text-align: center;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.8);
 }
 
 /* Table styles */
@@ -45,7 +49,6 @@ table {
   margin: 0 auto;
   border-collapse: collapse;
   width: 100%;
-  max-width: 100%;
   font-size: 14px;
   background-color: white;
   border-radius: 8px;
@@ -73,8 +76,8 @@ th {
   letter-spacing: 0.5px;
 }
 
-td {
-  transition: background-color 0.2s ease;
+tr:hover td {
+  background-color: #f8f9fa;
 }
 
 /* Button styles */
@@ -93,7 +96,7 @@ button {
 
 button:hover {
   background: linear-gradient(135deg, #0056b3 0%, #004494 100%);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
 }
 
@@ -103,15 +106,17 @@ button:active {
 
 /* Status classes */
 .unpaid {
-  background-color: #fff5f5;
+  background-color: #ffe5e5;
   color: #dc3545;
   font-weight: 500;
+  border-left: 4px solid #dc3545;
 }
 
 .paid {
-  background-color: #f0fff4;
+  background-color: #e6ffed;
   color: #28a745;
   font-weight: 500;
+  border-left: 4px solid #28a745;
 }
 
 .receiver {
@@ -164,7 +169,7 @@ button:active {
 
 .voice-btn:hover {
   background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(40, 167, 69, 0.4);
 }
 
@@ -179,6 +184,9 @@ button:active {
   color: #6c757d;
   margin-bottom: 15px;
   font-size: 1em;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
 }
 
 /* Responsive design */
@@ -200,6 +208,7 @@ button:active {
   .summary {
     font-size: 1.2em;
     padding: 25px;
+    gap: 20px;
   }
 }
 
@@ -218,12 +227,7 @@ button:active {
   }
   
   .summary {
-    flex-direction: column;
     gap: 15px;
-  }
-  
-  .summary > div {
-    flex: none;
   }
 }
 
@@ -235,79 +239,88 @@ button:active {
   }
   
   .summary {
-    flex-direction: column;
     gap: 10px;
     padding: 15px;
     font-size: 1em;
   }
   
   table {
-    font-size: 12px;
-    overflow-x: auto;
-    display: block;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    border: 0;
+    box-shadow: none;
   }
   
   thead {
-    display: none; /* Hide headers on small screens for card-like view, but since it's table, keep scroll */
-  }
-  
-  tbody, tr, td {
-    display: block;
-    width: 100%;
-    text-align: left;
-    border: none;
-    border-bottom: 1px solid #e0e0e0;
-    padding: 10px;
+    display: none;
   }
   
   tr {
+    display: block;
+    margin-bottom: 15px;
     border: 1px solid #e0e0e0;
-    margin-bottom: 10px;
-    border-radius: 8px;
+    border-radius: 12px;
     background: white;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    padding: 10px;
+    transition: box-shadow 0.3s ease;
+  }
+  
+  tr:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  td {
+    display: block;
+    border: none;
+    text-align: left;
+    padding: 8px 0;
+    position: relative;
   }
   
   td:before {
     content: attr(data-label) ": ";
     font-weight: bold;
     color: #007bff;
-    display: block;
+    display: inline-block;
+    width: 40%;
+    padding-right: 10px;
   }
   
-  /* Hide non-essential columns if data-label is used */
-  th:nth-child(6), td:nth-child(6),
-  th:nth-child(7), td:nth-child(7) {
+  td:last-child {
+    text-align: center;
+  }
+  
+  /* Hide non-essential columns */
+  td:nth-child(6), td:nth-child(7) {
     display: none;
   }
   
   button, .voice-btn {
     width: 100%;
-    margin-bottom: 10px;
+    margin-top: 10px;
     padding: 12px;
-    font-size: 16px; /* Prevent zoom on iOS */
+    font-size: 16px;
   }
   
   .due-badge {
     display: block;
-    margin: 5px auto 0;
+    margin: 10px auto 0;
     width: fit-content;
   }
 }
 
 /* Extra small phones */
 @media (max-width: 480px) {
-  .summary {
-    font-size: 0.95em;
+  .summary > div {
+    flex-basis: 100%;
   }
   
-  th, td {
-    padding: 8px 6px;
+  td:before {
+    width: 100%;
+    display: block;
+    margin-bottom: 5px;
   }
   
-  .voice-text {
-    font-size: 0.95em;
+  td {
+    text-align: left;
   }
 }
