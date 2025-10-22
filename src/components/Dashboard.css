@@ -1,7 +1,7 @@
-/* --- Base Layout --- */
+/* === General Layout === */
 body {
-  font-family: 'Poppins', sans-serif;
-  background: #f0f2f5;
+  font-family: "Poppins", sans-serif;
+  background: #f4f6f9;
   margin: 0;
   color: #333;
 }
@@ -9,76 +9,78 @@ body {
 .dashboard {
   max-width: 1200px;
   margin: 40px auto;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
-  padding: 30px;
+  padding: 20px;
 }
 
-/* --- Title --- */
+/* === Header === */
 h2 {
   text-align: center;
-  color: #222;
-  margin-bottom: 25px;
+  color: #1e2a38;
+  font-size: 1.8em;
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
   font-weight: 600;
 }
 
-/* --- Summary Section --- */
+/* === Voice Update Button === */
+.voice-btn {
+  display: block;
+  width: 100%;
+  max-width: 200px;
+  margin: 0 auto 25px auto;
+  background-color: #22c55e;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 3px 10px rgba(34, 197, 94, 0.3);
+}
+.voice-btn:hover {
+  background-color: #16a34a;
+}
+
+/* === Summary Section === */
 .summary {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 20px;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  background: linear-gradient(135deg, #007bff, #00c6ff);
-  color: white;
-  padding: 20px;
-  border-radius: 12px;
+  justify-content: space-around;
   text-align: center;
   margin-bottom: 25px;
-  font-size: 1.05em;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
 }
 
 .summary div {
-  flex: 1 1 250px;
+  flex: 1 1 240px;
   margin: 10px;
-}
-
-/* --- Table Styling --- */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
+  background: #f9fafb;
   border-radius: 8px;
-  overflow: hidden;
-  background: #fff;
+  padding: 12px;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
 }
 
-th {
-  background-color: #007bff;
-  color: white;
-  padding: 12px 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-weight: 500;
+.summary strong {
+  color: #007bff;
 }
 
-td {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-  text-align: center;
+/* === Buttons === */
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin: 15px 0;
 }
 
-tr:hover {
-  background-color: #f9f9f9;
-  transition: 0.3s;
-}
-
-/* --- Buttons --- */
 button {
   background-color: #007bff;
   color: white;
   border: none;
-  padding: 8px 14px;
+  padding: 8px 16px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 500;
@@ -90,97 +92,115 @@ button:hover {
   transform: translateY(-1px);
 }
 
-/* --- Status Colors --- */
-.unpaid {
-  background-color: #ffeaea;
-  color: #b30000;
+/* === Receiver History & Table Section === */
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  margin-bottom: 25px;
 }
 
+h3 {
+  color: #222;
+  text-align: left;
+  font-weight: 600;
+  margin-bottom: 12px;
+  border-left: 4px solid #007bff;
+  padding-left: 10px;
+}
+
+/* === Table Styling === */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+}
+
+th {
+  background-color: #007bff;
+  color: white;
+  padding: 12px 8px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* === Status Tags === */
 .paid {
   background-color: #e6ffe9;
   color: #007a00;
+  font-weight: bold;
+  border-radius: 20px;
+  padding: 5px 12px;
+}
+
+.unpaid {
+  background-color: #ffeaea;
+  color: #a10000;
+  font-weight: bold;
+  border-radius: 20px;
+  padding: 5px 12px;
 }
 
 .receiver {
   background-color: #fff8e1;
-  font-weight: 600;
   color: #c47f00;
+  border-radius: 20px;
+  padding: 5px 12px;
 }
 
-/* --- Previous Dues --- */
-.prev-due {
-  background-color: #fff4b3 !important;
-  color: #a10000 !important;
-  font-weight: bold;
-}
-
-.due-badge {
-  display: inline-block;
-  background-color: #e60000;
-  color: white;
-  font-size: 0.8em;
-  padding: 3px 8px;
-  border-radius: 8px;
-  margin-left: 5px;
-}
-
-/* --- Voice Button --- */
-.voice-btn {
-  display: inline-block;
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  margin-bottom: 15px;
-}
-
-.voice-btn:hover {
-  background-color: #218838;
-}
-
-.voice-btn.active {
-  background-color: #dc3545;
-}
-
-.voice-text {
-  font-style: italic;
-  color: #444;
-  margin-bottom: 15px;
-}
-
-/* --- Receiver History Title --- */
-h3 {
-  margin-top: 40px;
+/* === Pagination Buttons === */
+.pagination {
   text-align: center;
-  color: #333;
-  font-weight: 600;
-  border-bottom: 2px solid #007bff;
-  display: inline-block;
-  padding-bottom: 5px;
+  margin: 20px 0;
 }
 
-/* --- Responsive --- */
+.pagination button {
+  background-color: #e0e7ff;
+  color: #1e3a8a;
+  margin: 0 3px;
+}
+
+.pagination button:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+/* === Notes Section === */
+.note {
+  text-align: center;
+  font-size: 0.9em;
+  color: #555;
+  margin-top: 15px;
+  line-height: 1.5;
+}
+
+/* === Responsive === */
 @media (max-width: 768px) {
   .summary {
     flex-direction: column;
+    text-align: center;
   }
-
+  .action-buttons {
+    flex-direction: column;
+  }
+  button {
+    width: 100%;
+  }
   table {
-    width: 100%;
-    font-size: 14px;
-  }
-
-  th, td {
-    padding: 8px 5px;
-  }
-
-  .voice-btn {
-    width: 100%;
+    font-size: 13px;
   }
 }
