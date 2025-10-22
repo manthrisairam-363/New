@@ -1,196 +1,111 @@
-/* === GLOBAL RESET === */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: "Poppins", sans-serif;
-  background: #f4f6f9;
-  color: #333;
-}
-
-/* === MAIN CONTAINER === */
 .dashboard {
-  max-width: 1200px;
-  margin: 40px auto;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-}
-
-/* === HEADER === */
-h2 {
   text-align: center;
-  color: #1e2a38;
-  font-size: 1.8em;
-  font-weight: 600;
+  margin: 30px;
 }
 
-/* === VOICE BUTTON === */
-.voice-btn {
-  background-color: #22c55e;
-  color: white;
-  border: none;
-  padding: 12px 25px;
-  border-radius: 8px;
+table {
+  margin: auto;
+  border-collapse: collapse;
+  width: 80%;
   font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: 0.3s;
-  box-shadow: 0 3px 8px rgba(34, 197, 94, 0.3);
 }
 
-.voice-btn:hover {
-  background-color: #16a34a;
-}
-
-/* === SUMMARY SECTION === */
-.summary {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 15px;
-  width: 100%;
-}
-
-.summary-card {
-  background: white;
-  border-radius: 12px;
-  padding: 15px;
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px 12px;
   text-align: center;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-}
-
-.summary-card h4 {
-  font-size: 15px;
-  color: #555;
-  margin-bottom: 5px;
-}
-
-.summary-card strong {
-  font-size: 18px;
-  color: #007bff;
-}
-
-/* === ACTION BUTTONS === */
-.action-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
 }
 
 button {
   background-color: #007bff;
   color: white;
   border: none;
-  padding: 8px 14px;
+  padding: 5px 10px;
   border-radius: 6px;
   cursor: pointer;
-  transition: 0.3s;
-  font-size: 14px;
 }
 
 button:hover {
   background-color: #0056b3;
-  transform: translateY(-1px);
-}
-
-/* === DATA CARD === */
-.card {
-  width: 100%;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  padding: 20px;
-}
-
-/* === TABLE === */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-top: 15px;
-}
-
-th {
-  background-color: #007bff;
-  color: white;
-  padding: 10px;
-  font-weight: 500;
-  text-transform: uppercase;
-  font-size: 13px;
-}
-
-td {
-  text-align: center;
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-}
-
-tr:nth-child(even) {
-  background-color: #f8f9fa;
-}
-
-/* === STATUS TAGS === */
-.paid {
-  background-color: #e6ffe9;
-  color: #008000;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-weight: 600;
 }
 
 .unpaid {
   background-color: #ffeaea;
-  color: #b30000;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-weight: 600;
+  color: #a10000;
 }
 
-/* === PAGINATION === */
-.pagination {
-  text-align: center;
-  margin-top: 20px;
+.paid {
+  background-color: #e8ffe8;
+  color: #006400;
 }
 
-.pagination button {
-  background-color: #e0e7ff;
-  color: #1e3a8a;
-  margin: 0 3px;
+.receiver {
+  background-color: #fff8e1;
+  font-weight: bold;
 }
 
-.pagination button:hover {
-  background-color: #007bff;
-  color: white;
+.prev-due {
+  background-color: #fff4b3 !important; /* light yellow, adjust as you like */
+  color: #a10000 !important;
+  font-weight: bold;
 }
 
-/* === FOOTER NOTE === */
-.note {
-  text-align: center;
+.due-badge {
+  display: inline-block;
+  background-color: #d20000;
+  color: #fff;
   font-size: 0.9em;
-  color: #666;
-  line-height: 1.5;
-  margin-top: 15px;
-  max-width: 800px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 8px;
+  letter-spacing: 1px;
 }
 
-/* === RESPONSIVE === */
-@media (max-width: 768px) {
-  .dashboard {
-    padding: 15px;
-  }
+.voice-btn {
+  margin-bottom: 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
 
+.voice-btn.active {
+  background-color: #dc3545;
+}
+
+.voice-text {
+  font-style: italic;
+  color: #333;
+  margin-bottom: 15px;
+}
+.summary {
+  background: #f5f5f5;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-around;
+  font-size: 1.1em;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
   table {
+    width: 100%;
     font-size: 12px;
+    overflow-x: auto;
+    display: block;
   }
-
-  .summary {
-    grid-template-columns: 1fr;
+  th, td {
+    padding: 8px 4px;
+    word-break: break-word;
+  }
+  th:nth-child(6), td:nth-child(6), th:nth-child(7), td:nth-child(7) {
+    display: none;
   }
 }
+
