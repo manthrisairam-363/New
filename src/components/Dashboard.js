@@ -329,34 +329,65 @@ const togglePayment = async (member) => {
           Heard: "{voiceText}"
         </div>
       )}
-      <div className="summary">
-        <p>
-          <b>Month:</b> {selectedMonth} &nbsp;|&nbsp; <b>Total Members:</b> {members.length} &nbsp;|&nbsp;
-          <b>Paid:</b> {paidCount} &nbsp;|&nbsp; <b>Unpaid:</b> {members.length - paidCount}
-        </p>
-        <p>
-          <b>This Month’s Receiver:</b> Member {getCurrentReceiverId()} &nbsp;|&nbsp; Chit Amount: ₹{getChitAmount(selectedMonth).toLocaleString()}
-        </p>
-        <div style={{ marginTop: 8 }}>
-          <button onClick={advanceMonth} style={{ marginRight: 8 }}>
-            Advance Month (manual)
-          </button>
-          <button onClick={resetThisMonth} style={{ marginRight: 8 }}>
-            Reset This Month (mark all unpaid)
-          </button>
+ // NEW CODE TO ADD (This uses the CSS grid classes: summary-container, summary, summary-card)
+
+{/* --- Voice Input Section (Keep this where it is) --- */}
+<button
+    className={`voice-btn${listening ? " active" : ""}`}
+    onClick={startVoiceRecognition}
+    disabled={listening}
+>
+    {listening ? "Listening..." : "Voice Update"}
+</button>
+{voiceText && (
+    <div className="voice-text">
+        Heard: "{voiceText}"
+    </div>
+)}
+
+{/* --- Summary Card Container (STARTS HERE) --- */}
+<div className="summary-container">
+    <div className="summary">
+        <div className="summary-card">
+            <small style={{ color: '#007bff' }}>Current Month Status</small>
+            <strong>Month: {selectedMonth}</strong>
+            <small>
+                Paid: {paidCount} / Unpaid: {members.length - paidCount}
+            </small>
         </div>
-      </div>
-      <div className="amount-summary" style={{ marginTop: 12 }}>
-        <p>
-          <b>Total Amount Per Month:</b> ₹{totalPerMonth.toLocaleString()}
-        </p>
-        <p>
-          <b>Collected This Month:</b> ₹{collected.toLocaleString()}
-        </p>
-        <p>
-          <b>Pending Collection:</b> ₹{pending.toLocaleString()}
-        </p>
-      </div>
+        
+        <div className="summary-card">
+            <small style={{ color: '#28a745' }}>Collected This Month</small>
+            <strong>₹{collected.toLocaleString()}</strong>
+            <small>Total Expected: ₹{totalPerMonth.toLocaleString()}</small>
+        </div>
+        
+        <div className="summary-card" style={{ background: '#fff3cd' }}>
+            <small style={{ color: '#dc3545' }}>Pending Collection</small>
+            <strong style={{ color: '#dc3545' }}>₹{pending.toLocaleString()}</strong>
+            <small>Due in current month</small>
+        </div>
+        
+        <div className="summary-card">
+            <small style={{ color: '#6c757d' }}>Current Receiver</small>
+            <strong>Member {getCurrentReceiverId()}</strong>
+            <small>Chit Value: ₹{getChitAmount(selectedMonth).toLocaleString()}</small>
+        </div>
+    </div>
+
+    {/* --- Admin Actions --- */}
+    <div style={{ marginTop: 20, paddingTop: 10, borderTop: '1px solid #eee' }}>
+        <button className="action-button" onClick={advanceMonth} style={{ marginRight: 10, backgroundColor: '#ffc107' }}>
+            Advance to Month {getCurrentMonth() + 1}
+        </button>
+        <button className="action-button" onClick={resetThisMonth} style={{ backgroundColor: '#dc3545' }}>
+            Reset Month {selectedMonth} Payments
+        </button>
+    </div>
+</div>
+
+{/* --- Months Selector and Table follow this --- */}
+
       {/* Months Selector */}
       <div
         className="months-bar"
