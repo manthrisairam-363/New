@@ -314,183 +314,201 @@ const togglePayment = async (member) => {
   );
 
   return (
-    <div className="dashboard" style={{ padding: 20 }}>
-      <h2>Chitt Tracker Dashboard</h2>
+    <div className="dashboard">
+      <h2 style={{ marginBottom: 20 }}>Chitt Tracker Dashboard</h2>
+
+      {/* Voice Input Section */}
       <button
         className={`voice-btn${listening ? " active" : ""}`}
         onClick={startVoiceRecognition}
         disabled={listening}
-        style={{ marginBottom: 16 }}
       >
         {listening ? "Listening..." : "Voice Update"}
       </button>
       {voiceText && (
-        <div className="voice-text" style={{ marginBottom: 8 }}>
+        <div className="voice-text">
           Heard: "{voiceText}"
         </div>
       )}
- // NEW CODE TO ADD (This uses the CSS grid classes: summary-container, summary, summary-card)
 
-// This section should be placed after your main <h2> tag in the return function
-
-{/* Voice Input Section */}
-<button
-    className={`voice-btn${listening ? " active" : ""}`}
-    onClick={startVoiceRecognition}
-    disabled={listening}
->
-    {listening ? "Listening..." : "Voice Update"}
-</button>
-{voiceText && (
-    <div className="voice-text">
-        Heard: "{voiceText}"
-    </div>
-)}
-
-{/* Summary Card Container */}
-<div className="summary-container">
-    <div className="summary">
-        <div className="summary-card">
+      {/* Summary Card Container */}
+      <div className="summary-container">
+        <div className="summary">
+          <div className="summary-card">
             <small style={{ color: '#007bff' }}>Current Month Status</small>
             <strong>Month: {selectedMonth}</strong>
             <small>
                 Paid: {paidCount} / Unpaid: {members.length - paidCount}
             </small>
-        </div>
-        
-        <div className="summary-card">
+          </div>
+          
+          <div className="summary-card">
             <small style={{ color: '#28a745' }}>Collected This Month</small>
             <strong>₹{collected.toLocaleString()}</strong>
             <small>Total Expected: ₹{totalPerMonth.toLocaleString()}</small>
-        </div>
-        
-        <div className="summary-card" style={{ background: '#fff3cd' }}>
+          </div>
+          
+          <div className="summary-card" style={{ background: '#fff3cd' }}>
             <small style={{ color: '#dc3545' }}>Pending Collection</small>
             <strong style={{ color: '#dc3545' }}>₹{pending.toLocaleString()}</strong>
             <small>Due in current month</small>
-        </div>
-        
-        <div className="summary-card">
+          </div>
+          
+          <div className="summary-card">
             <small style={{ color: '#6c757d' }}>Current Receiver</small>
             <strong>Member {getCurrentReceiverId()}</strong>
             <small>Chit Value: ₹{getChitAmount(selectedMonth).toLocaleString()}</small>
+          </div>
         </div>
-    </div>
 
-    {/* Admin Actions */}
-    <div style={{ marginTop: 20, paddingTop: 10, borderTop: '1px solid #eee' }}>
-        <button className="action-button" onClick={advanceMonth} style={{ marginRight: 10, backgroundColor: '#ffc107' }}>
+        {/* Admin Actions */}
+        <div style={{ marginTop: 20, paddingTop: 10, borderTop: '1px solid #eee' }}>
+          <button className="action-button" onClick={advanceMonth} style={{ marginRight: 10, backgroundColor: '#ffc107' }}>
             Advance to Month {getCurrentMonth() + 1}
-        </button>
-        <button className="action-button" onClick={resetThisMonth} style={{ backgroundColor: '#dc3545' }}>
+          </button>
+          <button className="action-button" onClick={resetThisMonth} style={{ backgroundColor: '#dc3545' }}>
             Reset Month {selectedMonth} Payments
-        </button>
-    </div>
-</div>
+          </button>
+        </div>
+      </div>
 
-{/* Months Selector and Table follow this */}
-
-      <h3 style={{ marginTop: 18 }}>Members</h3>
-      <table className="members-table">
-        <thead>
-          <tr>
-            <th>Member ID</th>
-            <th>Name</th>
-            <th>Picked Month</th>
-            <th>Payment for Month {selectedMonth}</th>
-            <th>Status (Month {selectedMonth})</th>
-            <th>Short Payment</th>
-            <th>Due</th>
-          </tr>
-        </thead>
-        <tbody>
-  {members.map((m) => {
-    const prevMonthDue = selectedMonth > 1 ? getMemberDueAmount(m, selectedMonth - 1) : 0;
-    const rowClass = prevMonthDue > 0 ? "prev-due" : "";
-    const showBadge = prevMonthDue > 0;
-    const isPaid = Boolean(m.payments?.[selectedMonth]);
-    return (
-      <tr
-        key={m.id}
-        className={`${rowClass} ${m.id === getCurrentReceiverId() ? "receiver" : isPaid ? "paid" : "unpaid"}`}
+      {/* Months Selector */}
+      <div
+        className="months-bar"
+        style={{ marginBottom: 24, textAlign: "center" }}
       >
-        <td>{m.id}</td>
-        <td>{m.name}</td>
-        <td>
-          {m.chitMonthPicked
-            ? `Month ${m.chitMonthPicked}`
-            : !alreadyPicked ? (
-                <button onClick={() => assignChitMonth(m, selectedMonth)}>
-                  Pick Now ({selectedMonth})
-                </button>
-              ) : (
-                "-"
-              )}
-        </td>
-        <td>
-          ₹{getMemberPaymentAmount(m, selectedMonth).toLocaleString()}
-        </td>
-<td>
-  {
-    (() => {
-      const paymentObj = m.payments?.[selectedMonth] || {};
-      const paid = paymentObj.paid || false;
-      const paidDate = paymentObj.date;
-      return !paid ? (
-        <button onClick={() => togglePayment(m)}>
-          Mark Paid
-        </button>
-      ) : (
-        <>
-          ✅ Paid
-          {paidDate && (
-            <span style={{
-              marginLeft: 6,
-              color: "#888",
-              fontWeight: "normal",
-              fontSize: "0.85em"
-            }}>
-              ({new Date(paidDate).toLocaleString()})
-            </span>
-          )}
-        </>
-      );
-    })()
-  }
-</td>
+        {[...Array(TOTAL_MONTHS)].map((_, i) => (
+          <button
+            key={i + 1}
+            onClick={() => setSelectedMonth(i + 1)}
+            style={{
+              margin: "2px",
+              fontWeight: selectedMonth === i + 1 ? "bold" : "normal",
+              background: selectedMonth === i + 1 ? "#007bff" : "#e9ecef",
+              color: selectedMonth === i + 1 ? "white" : "#495057",
+              border: 'none',
+              borderRadius: 4,
+              padding: "4px 12px",
+              cursor: 'pointer'
+            }}
+          >
+            {i + 1}
+          </button>
+        ))}
+      </div>
 
-        <td>
-          <input
-            type="number"
-            min="0"
-            value={m.shortPayments?.[selectedMonth] || 0}
-            onChange={e =>
-              updateShortPayment(m, selectedMonth, parseFloat(e.target.value) || 0)
-            }
-            style={{ width: 80 }}
-          />
-        </td>
-        <td>
-          ₹{getMemberDueAmount(m, selectedMonth).toLocaleString()}
-          {showBadge && (
-            <span className="due-badge">
-              DUE! ⚠️
-            </span>
-          )}
-        </td>
-      </tr>
-    );
-  })}
-</tbody>
+      {/* Main Data Table Card */}
+      <div className="table-card">
+        <h3 style={{ marginTop: 0, marginBottom: 20, textAlign: 'left' }}>
+          Payment Tracking for Month {selectedMonth}
+        </h3>
+        
+        <table className="members-table">
+          <thead>
+            <tr>
+              <th>Member ID</th>
+              <th>Name</th>
+              <th>Picked Month</th>
+              <th>Payment Due (M{selectedMonth})</th>
+              <th>Status</th>
+              <th>Short Payment</th>
+              <th>Total Due</th>
+            </tr>
+          </thead>
+          <tbody>
+            {members.map((m) => {
+              const prevMonthDue = selectedMonth > 1 ? getMemberDueAmount(m, selectedMonth - 1) : 0;
+              const rowClass = prevMonthDue > 0 ? "prev-due" : "";
+              const showBadge = prevMonthDue > 0;
+              const isPaid = Boolean(m.payments?.[selectedMonth]);
+              
+              // Determine the primary status class
+              let statusClass = isPaid ? "paid" : "unpaid";
+              if (m.id === getCurrentReceiverId()) {
+                  statusClass = "receiver";
+              }
 
-      </table>
-      <div style={{ marginTop: 20, color: "#555" }}>
+              return (
+                <tr
+                  key={m.id}
+                  // Apply two classes: the status class AND the prev-due class if applicable
+                  className={`${rowClass} ${statusClass}`} 
+                >
+                  <td>{m.id}</td>
+                  <td>{m.name}</td>
+                  <td>
+                    {m.chitMonthPicked
+                      ? `Month ${m.chitMonthPicked}`
+                      : !alreadyPicked ? (
+                          <button className="action-button" onClick={() => assignChitMonth(m, selectedMonth)}>
+                            Pick Now
+                          </button>
+                        ) : (
+                          "-"
+                        )}
+                  </td>
+                  <td>
+                    ₹{getMemberPaymentAmount(m, selectedMonth).toLocaleString()}
+                  </td>
+                  <td>
+                    {
+                      (() => {
+                        const paymentObj = m.payments?.[selectedMonth] || {};
+                        const paid = paymentObj.paid || false;
+                        const paidDate = paymentObj.date;
+                        return !paid ? (
+                          <button className="action-button" style={{backgroundColor: '#00cc66'}} onClick={() => togglePayment(m)}>
+                            Mark Paid
+                          </button>
+                        ) : (
+                          <>
+                            ✅ Paid
+                            {paidDate && (
+                              <span style={{
+                                marginLeft: 6,
+                                color: "#6c757d", // Muted for date
+                                fontWeight: "normal",
+                                fontSize: "0.85em"
+                              }}>
+                                ({new Date(paidDate).toLocaleDateString()})
+                              </span>
+                            )}
+                          </>
+                        );
+                      })()
+                    }
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      min="0"
+                      value={m.shortPayments?.[selectedMonth] || 0}
+                      onChange={e =>
+                        updateShortPayment(m, selectedMonth, parseFloat(e.target.value) || 0)
+                      }
+                      style={{ width: 80, padding: 5, borderRadius: 4, border: '1px solid #ccc' }}
+                    />
+                  </td>
+                  <td>
+                    <strong style={{color: showBadge ? '#dc3545' : '#333'}}>
+                      ₹{getMemberDueAmount(m, selectedMonth).toLocaleString()}
+                    </strong>
+                    {showBadge && (
+                      <span className="due-badge">
+                        DUE!
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div style={{ marginTop: 20, color: "#6c757d", fontSize: '0.9em' }}>
         <small>
-          Only one member can pick chit in a month. All members pay only that
-          month's value from your scheme until they pick chit.
-          <br />
-          The "Pick Now" button will disappear after a member is picked for
-          this month.
+          **Important Note:** The "Total Due" column includes any unpaid months' amounts 
+          *plus* accumulated short payments up to the selected month.
         </small>
       </div>
     </div>
