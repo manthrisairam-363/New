@@ -1,111 +1,200 @@
+/* --- Global Styles & Typography --- */
+body {
+    background-color: #f0f2f5; /* Light grey background for clean look */
+    font-family: 'Inter', sans-serif; /* Use a modern, clean font */
+    color: #333;
+}
+
 .dashboard {
-  text-align: center;
-  margin: 30px;
+    max-width: 1200px;
+    margin: 30px auto; /* Center the entire dashboard */
+    padding: 0 20px;
+    text-align: center;
 }
 
-table {
-  margin: auto;
-  border-collapse: collapse;
-  width: 80%;
-  font-size: 16px;
+/* --- Summary & Card Section --- */
+.summary-container {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Subtle shadow for depth */
+    margin-bottom: 30px;
 }
 
-th, td {
-  border: 1px solid #ccc;
-  padding: 8px 12px;
-  text-align: center;
+.summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive card grid */
+    gap: 20px;
+    margin-bottom: 20px;
+    font-size: 1.1em;
+    font-weight: 500;
 }
 
-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 6px;
-  cursor: pointer;
+.summary-card {
+    background: #f8f9fa; /* Light background for individual cards */
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    text-align: left;
+    transition: transform 0.2s;
 }
 
-button:hover {
-  background-color: #0056b3;
+.summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.unpaid {
-  background-color: #ffeaea;
-  color: #a10000;
+.summary-card strong {
+    display: block;
+    font-size: 1.6em;
+    margin-top: 5px;
+    color: #007bff; /* Primary color highlight */
 }
 
-.paid {
-  background-color: #e8ffe8;
-  color: #006400;
-}
-
-.receiver {
-  background-color: #fff8e1;
-  font-weight: bold;
-}
-
-.prev-due {
-  background-color: #fff4b3 !important; /* light yellow, adjust as you like */
-  color: #a10000 !important;
-  font-weight: bold;
-}
-
-.due-badge {
-  display: inline-block;
-  background-color: #d20000;
-  color: #fff;
-  font-size: 0.9em;
-  font-weight: bold;
-  padding: 2px 8px;
-  border-radius: 10px;
-  margin-left: 8px;
-  letter-spacing: 1px;
-}
-
+/* --- Voice Input & Action Button --- */
 .voice-btn {
-  margin-bottom: 20px;
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
+    margin-bottom: 20px;
+    background-color: #28a745; /* Green for action */
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 30px; /* Pill shape for modern look */
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(40, 167, 69, 0.4);
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.voice-btn:hover {
+    background-color: #1e7e34;
+    transform: translateY(-1px);
 }
 
 .voice-btn.active {
-  background-color: #dc3545;
+    background-color: #dc3545; /* Red when active (recording) */
+    box-shadow: 0 3px 6px rgba(220, 53, 69, 0.4);
 }
 
 .voice-text {
-  font-style: italic;
-  color: #333;
-  margin-bottom: 15px;
-}
-.summary {
-  background: #f5f5f5;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: space-around;
-  font-size: 1.1em;
-  font-weight: 500;
+    font-style: italic;
+    color: #6c757d; /* Muted text */
+    margin-bottom: 15px;
+    font-size: 0.95em;
 }
 
-@media (max-width: 600px) {
-  table {
+/* --- Main Table Styles (Encased in a Card) --- */
+.table-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    overflow-x: auto; /* Ensure horizontal scroll on small screens */
+}
+
+table {
+    margin: 0 auto;
+    border-collapse: separate; /* Use separate for rounded corners on cells */
+    border-spacing: 0;
     width: 100%;
-    font-size: 12px;
-    overflow-x: auto;
-    display: block;
-  }
-  th, td {
-    padding: 8px 4px;
-    word-break: break-word;
-  }
-  th:nth-child(6), td:nth-child(6), th:nth-child(7), td:nth-child(7) {
-    display: none;
-  }
+    min-width: 800px; /* Ensure space for content on desktop */
+    font-size: 15px;
 }
 
+th, td {
+    border: none; /* Remove default border for cleaner look */
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid #eee; /* Light divider */
+}
+
+th {
+    background-color: #007bff; /* Header color */
+    color: white;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    position: sticky; /* Keep header visible when scrolling */
+    top: 0;
+    z-index: 10;
+}
+
+/* Rounded corners for the header */
+th:first-child { border-top-left-radius: 10px; }
+th:last-child { border-top-right-radius: 10px; }
+
+/* --- Action Buttons in Table --- */
+.action-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.action-button:hover {
+    background-color: #0056b3;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Status and Highlight Classes (Modernized) --- */
+
+.unpaid {
+    background-color: #fff1f1; /* Very light red */
+    color: #cc0000;
+    font-weight: 600;
+}
+
+.paid {
+    background-color: #f1fff1; /* Very light green */
+    color: #008000;
+    font-weight: 600;
+}
+
+.receiver {
+    background-color: #fffde7; /* Soft yellow for emphasis */
+    color: #8a6d3b;
+    font-weight: bold;
+    box-shadow: inset 0 0 0 2px #ffc107; /* Highlight border */
+}
+
+.prev-due {
+    background-color: #ffe0b2 !important; /* Amber-toned background */
+    color: #b74f00 !important;
+    font-weight: bold;
+    font-style: italic;
+}
+
+.due-badge {
+    display: inline-block;
+    background-color: #dc3545; /* Dark red for urgency */
+    color: #fff;
+    font-size: 0.85em;
+    font-weight: bold;
+    padding: 3px 10px;
+    border-radius: 15px;
+    margin-left: 5px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .dashboard {
+        margin: 15px auto;
+        padding: 0 10px;
+    }
+    .summary {
+        grid-template-columns: 1fr; /* Stack cards vertically on small screens */
+    }
+    .summary-card strong {
+        font-size: 1.4em;
+    }
+    /* The table scrollbar handles the overflow, but we can adjust padding */
+    th, td {
+        padding: 10px 6px;
+        font-size: 13px;
+    }
+}
