@@ -331,7 +331,9 @@ const togglePayment = async (member) => {
       )}
  // NEW CODE TO ADD (This uses the CSS grid classes: summary-container, summary, summary-card)
 
-{/* Voice Input Section (Keep this where it is) */}
+// This section should be placed after your main <h2> tag in the return function
+
+{/* Voice Input Section */}
 <button
     className={`voice-btn${listening ? " active" : ""}`}
     onClick={startVoiceRecognition}
@@ -345,7 +347,7 @@ const togglePayment = async (member) => {
     </div>
 )}
 
-{/* Summary Card Container (STARTS HERE) */}
+{/* Summary Card Container */}
 <div className="summary-container">
     <div className="summary">
         <div className="summary-card">
