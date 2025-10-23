@@ -331,7 +331,7 @@ const togglePayment = async (member) => {
       )}
  // NEW CODE TO ADD (This uses the CSS grid classes: summary-container, summary, summary-card)
 
-{/* --- Voice Input Section (Keep this where it is) --- */}
+{/* Voice Input Section (Keep this where it is) */}
 <button
     className={`voice-btn${listening ? " active" : ""}`}
     onClick={startVoiceRecognition}
@@ -345,7 +345,7 @@ const togglePayment = async (member) => {
     </div>
 )}
 
-{/* --- Summary Card Container (STARTS HERE) --- */}
+{/* Summary Card Container (STARTS HERE) */}
 <div className="summary-container">
     <div className="summary">
         <div className="summary-card">
@@ -375,7 +375,7 @@ const togglePayment = async (member) => {
         </div>
     </div>
 
-    {/* --- Admin Actions --- */}
+    {/* Admin Actions */}
     <div style={{ marginTop: 20, paddingTop: 10, borderTop: '1px solid #eee' }}>
         <button className="action-button" onClick={advanceMonth} style={{ marginRight: 10, backgroundColor: '#ffc107' }}>
             Advance to Month {getCurrentMonth() + 1}
@@ -386,30 +386,8 @@ const togglePayment = async (member) => {
     </div>
 </div>
 
-{/* --- Months Selector and Table follow this --- */}
+{/* Months Selector and Table follow this */}
 
-      {/* Months Selector */}
-      <div
-        className="months-bar"
-        style={{ marginBottom: 24, textAlign: "center" }}
-      >
-        {[...Array(TOTAL_MONTHS)].map((_, i) => (
-          <button
-            key={i + 1}
-            style={{
-              margin: "2px",
-              fontWeight: selectedMonth === i + 1 ? "bold" : "",
-              background: selectedMonth === i + 1 ? "#007bff" : "#eee",
-              color: selectedMonth === i + 1 ? "white" : "black",
-              borderRadius: 4,
-              padding: "3px 10px",
-            }}
-            onClick={() => setSelectedMonth(i + 1)}
-          >
-            {i + 1}
-          </button>
-        ))}
-      </div>
       <h3 style={{ marginTop: 18 }}>Members</h3>
       <table className="members-table">
         <thead>
