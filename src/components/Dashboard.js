@@ -24,15 +24,31 @@ const CHIT_AMOUNTS = [
   505000, 510000, 515000, 520000, 525000, 530000, 535000, 540000, 545000, 550000,
 ];
 
+// Your predefined member names and phones here
+const MEMBER_NAMES = [
+  "Sairam", "Arun", "Adhvaith", "Apoorva", "ramu",
+  "Member 6", "Member 7", "Member 8", "Member 9", "Member 10",
+  "Member 11", "Member 12", "Member 13", "Member 14", "Member 15",
+  "Member 16", "Member 17", "Member 18", "Member 19", "Member 20",
+  "Member 21", "Member 22", "Member 23", "Member 24", "Member 25",
+  "Member 26", "Member 27", "Member 28", "Member 29", "Member 30"
+];
+
+const MEMBER_PHONES = [
+  "9533126221", "9876543002", "9876543003", "9876543004", "9876543005",
+  "9876543006", "9876543007", "9876543008", "9876543009", "9876543010",
+  "9876543011", "9876543012", "9876543013", "9876543014", "9876543015",
+  "9876543016", "9876543017", "9876543018", "9876543019", "9876543020",
+  "9876543021", "9876543022", "9876543023", "9876543024", "9876543025",
+  "9876543026", "9876543027", "9876543028", "9876543029", "9876543030"
+];
+
 // Calculate due including all partial payments and unpaid logic
 const getMemberDueAmount = (member, currMonth) => {
   let due = 0;
   for (let m = 1; m <= currMonth; m++) {
-    // Add "short payment" for any month, even if paid, if nonzero
     const shortPayment = member.shortPayments?.[m] || 0;
     due += shortPayment;
-
-    // For UNPAID months, also add the base expected payment
     if (!member.payments?.[m]) {
       if (member.chitMonthPicked && m >= member.chitMonthPicked) {
         due += AFTER_AMOUNT;
@@ -57,16 +73,18 @@ export default function Dashboard() {
   const configDocRef = doc(db, "config", "settings");
 
   useEffect(() => {
-    const fetchAll = async () => {
+    async function fetchAll() {
       setLoading(true);
       try {
         const mSnap = await getDocs(membersCol);
         let mList = [];
         mSnap.forEach((d) => mList.push(d.data()));
+
         if (mList.length === 0) {
           const initial = Array.from({ length: TOTAL_MONTHS }, (_, i) => ({
             id: i + 1,
-            name: `Member ${i + 1}`,
+            name: MEMBER_NAMES[i] || `Member ${i + 1}`,
+            phone: MEMBER_PHONES[i] || "",
             chitMonthPicked: null,
             payments: {},
             shortPayments: {},
@@ -76,8 +94,10 @@ export default function Dashboard() {
           }
           mList = initial;
         } else {
-          mList = mList.map((mm) => ({
+          mList = mList.map((mm, idx) => ({
             ...mm,
+            name: mm.name || MEMBER_NAMES[idx] || `Member ${idx + 1}`,
+            phone: mm.phone || MEMBER_PHONES[idx] || "",
             chitMonthPicked:
               typeof mm.chitMonthPicked === "number" ? mm.chitMonthPicked : null,
             payments: mm.payments || {},
@@ -87,7 +107,6 @@ export default function Dashboard() {
         mList.sort((a, b) => a.id - b.id);
         setMembers(mList);
 
-        // Load config
         const cSnap = await getDoc(configDocRef);
         let cdata;
         if (!cSnap.exists()) {
@@ -124,10 +143,13 @@ export default function Dashboard() {
       } finally {
         setLoading(false);
       }
-    };
+    }
     fetchAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ...rest of your component code unchanged...
+
 
   const getCurrentMonth = () => config?.currentMonth || 1;
   const getCurrentReceiverId = () => config?.currentReceiver || 1;
@@ -402,12 +424,13 @@ const togglePayment = async (member) => {
         <h3 style={{ marginTop: 0, marginBottom: 20, textAlign: 'left' }}>
           Payment Tracking for Month {selectedMonth}
         </h3>
-        
+
         <table className="members-table">
           <thead>
             <tr>
               <th>Member ID</th>
               <th>Name</th>
+              <th>Phone</th> {/* new column */}
               <th>Picked Month</th>
               <th>Payment Due (M{selectedMonth})</th>
               <th>Status</th>
@@ -436,6 +459,7 @@ const togglePayment = async (member) => {
                 >
                   <td>{m.id}</td>
                   <td>{m.name}</td>
+                  <td>{m.phone}</td> {/* new column */}
                   <td>
                     {m.chitMonthPicked
                       ? `Month ${m.chitMonthPicked}`
