@@ -107,12 +107,12 @@ membersList.forEach(member => {
             <div className="chit-stats">
               <div className="stat">
                 <span className="stat-label">Total Collected</span>
-                <span className="stat-value collected">â‚¹{chit.totalCollected.toLocaleString()}</span>
+                <span className="stat-value collected">₹{chit.totalCollected.toLocaleString()}</span>
               </div>
               
               <div className="stat">
                 <span className="stat-label">Pending Collection</span>
-                <span className="stat-value pending">â‚¹{chit.totalPending.toLocaleString()}</span>
+                <span className="stat-value pending">₹{chit.totalPending.toLocaleString()}</span>
               </div>
               
               <div className="stat">
@@ -122,7 +122,7 @@ membersList.forEach(member => {
             </div>
             
             <div className="chit-actions">
-              <button className="manage-btn">Manage This Chit â†’</button>
+              <button className="manage-btn">Manage This Chit →</button>
             </div>
           </div>
         ))}
