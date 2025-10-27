@@ -190,6 +190,17 @@ export default function Dashboard({ chitId, onBack }) {
     }
   };
 
+    const sendWhatsappNotification = (member) => {
+  fetch("https://railway.com/project/67facc79-eeba-4bc4-b440-621124a83b3d/service/c3af1953-9fd3-4177-8372-66e7f4ad357e?environmentId=&id=6d0e05c1-2037-4aa9-8397-8d2eda0c75d3&context=2025-10-27T19%3A41%3A28.734960891Z#build", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      phone: member.phone,
+      message: `Your chit payment for Month ${selectedMonth} is marked as paid. Thank you, ${member.name}!`
+    }),
+  });
+}
+
   const updateShortPayment = async (member, month, amount) => {
     try {
       const updatedShortPayments = {
@@ -314,17 +325,6 @@ export default function Dashboard({ chitId, onBack }) {
     (sum, m) => sum + getMemberPaymentAmount(m, selectedMonth),
     0
   );
-  const sendWhatsappNotification = (member) => {
-  fetch("https://railway.com/project/67facc79-eeba-4bc4-b440-621124a83b3d/service/c3af1953-9fd3-4177-8372-66e7f4ad357e?environmentId=&id=6d0e05c1-2037-4aa9-8397-8d2eda0c75d3&context=2025-10-27T19%3A41%3A28.734960891Z#build", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      phone: member.phone,
-      message: `Your chit payment for Month ${selectedMonth} is marked as paid. Thank you, ${member.name}!`
-    }),
-  });
-}
-
 
 const collected = members.reduce((sum, m) => {
   const paid = m.payments?.[selectedMonth]?.paid || false;
