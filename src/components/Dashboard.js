@@ -217,28 +217,23 @@ const togglePayment = async (member) => {
 };
 
 // ---- WHATSAPP NOTIFICATION ----
-const sendWhatsappNotification = async (phone, message) => {
+const sendWhatsappNotification = async (member) => {
   try {
-    console.log("📤 Sending WhatsApp message to:", phone, message); // <--- ADD THIS
-
-    const res = await fetch("https://new-production-f59b.up.railway.app/send-whatsapp", {
+    const response = await fetch("https://new-production-f59b.up.railway.app/send-whatsapp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ phone, message }),
+      body: JSON.stringify({
+        phone: member.phone,
+        message: `Your chit payment for Month ${selectedMonth} is marked as paid. Thank you, ${member.name}!`
+      }),
     });
 
-    if (!res.ok) {
-      const error = await res.text();
-      console.error("❌ WhatsApp API error:", error);
-    } else {
-      const data = await res.json();
-      console.log("✅ WhatsApp message sent successfully:", data);
-    }
-  } catch (err) {
-    console.error("⚠️ Failed to connect to WhatsApp backend:", err);
+    const data = await response.json();
+    console.log("✅ WhatsApp response:", data);
+  } catch (error) {
+    console.error("❌ WhatsApp notification error:", error);
   }
 };
-
 
   const updateShortPayment = async (member, month, amount) => {
     try {

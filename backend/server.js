@@ -1,61 +1,57 @@
 ﻿import express from "express";
 import cors from "cors";
-import fetch from "node-fetch"; // or native fetch if using Node 18+
+import axios from "axios";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
-app.use(cors());
 app.use(express.json());
+app.use(cors());
 
-// Test route
+const PORT = process.env.PORT || 8080;
+const META_WA_TOKEN = process.env.META_WA_TOKEN;
+const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
+
+// ✅ Root endpoint
 app.get("/", (req, res) => {
   res.send("✅ WhatsApp Cloud API backend is running!");
 });
 
-// WhatsApp send endpoint
+// ✅ WhatsApp notification route
 app.post("/send-whatsapp", async (req, res) => {
+  console.log("📩 /send-whatsapp called with body:", req.body);
+
   try {
     const { phone, message } = req.body;
-
     if (!phone || !message) {
-      return res.status(400).json({ success: false, error: "Missing phone or message" });
+      return res.status(400).json({ error: "Missing phone or message" });
     }
 
-    const digits = String(phone).replace(/\D/g, "");
-    const to =
-      digits.startsWith("+") ? digits :
-      digits.startsWith("91") ? `+${digits}` :
-      `+91${digits}`;
+    const url = `https://graph.facebook.com/v17.0/${PHONE_NUMBER_ID}/messages`;
 
-    const url = `https://graph.facebook.com/v20.0/${process.env.PHONE_NUMBER_ID}/messages`;
-    const payload = {
-      messaging_product: "whatsapp",
-      to,
-      type: "text",
-      text: { body: message }
-    };
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.META_WA_TOKEN}`,
-        "Content-Type": "application/json"
+    const response = await axios.post(
+      url,
+      {
+        messaging_product: "whatsapp",
+        to: phone,
+        type: "text",
+        text: { body: message },
       },
-      body: JSON.stringify(payload)
-    });
+      {
+        headers: {
+          Authorization: `Bearer ${META_WA_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-    const data = await response.json();
-    if (!response.ok) {
-      console.error("WhatsApp send error:", data);
-      return res.status(response.status).json({ success: false, error: data });
-    }
-
-    res.json({ success: true, response: data });
+    console.log("✅ Message sent:", response.data);
+    res.json({ success: true, data: response.data });
   } catch (error) {
-    console.error("Send Exception:", error);
-    res.status(500).json({ success: false, error: "send_failed" });
+    console.error("❌ Error sending WhatsApp message:", error.response?.data || error.message);
+    res.status(500).json({ error: error.response?.data || error.message });
   }
 });
 
-// Use Railway PORT or default to 8080
-const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
