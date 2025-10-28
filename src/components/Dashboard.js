@@ -219,7 +219,7 @@ const togglePayment = async (member) => {
 // ---- WHATSAPP NOTIFICATION ----
 const sendWhatsappNotification = async (member) => {
   try {
-    const response = await fetch("https://new-production-f59b.up.railway.app/send-whatsapp", {
+    const response = await fetch("https://new-production-ffd2.up.railway.app/send-whatsapp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
