@@ -193,7 +193,7 @@ export default function Dashboard({ chitId, onBack }) {
 };
 
   const sendWhatsappNotification = (member) => {
-  fetch("https://railway.com/project/67facc79-eeba-4bc4-b440-621124a83b3d?environmentId=babdec88-4381-44c8-8e7c-9db5fd971c50", {
+  fetch("https://railway.com/project/81254759-2843-4e43-a888-25ee6fec8a33/service/1f73918d-290b-4e21-b1b8-c2c6a87f786f?environmentId=d74e0cfe-7e9b-48ac-a37c-fea49f266015", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
