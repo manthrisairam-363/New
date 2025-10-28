@@ -14,7 +14,7 @@ const META_WA_TOKEN = process.env.META_WA_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 
 // ✅ Root endpoint
-app.get("/", (req, res) => {
+app.post("/", (req, res) => {
   res.send("✅ WhatsApp Cloud API backend is running!");
 });
 
