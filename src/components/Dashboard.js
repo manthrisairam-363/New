@@ -161,47 +161,82 @@ export default function Dashboard({ chitId, onBack }) {
     return BEFORE_AMOUNTS[currMonth - 1] || AFTER_AMOUNT;
   };
 
-  const togglePayment = async (member) => {
-    try {
-      const month = selectedMonth;
-      const now = new Date().toISOString();
-      const payments = { ...member.payments };
+// ---- TOGGLE PAYMENT ----
+const togglePayment = async (member) => {
+  try {
+    const month = selectedMonth;
+    const now = new Date().toISOString();
+    const payments = { ...member.payments };
 
-      for (let m = 1; m <= month; m++) {
-        const paymentObj = payments[m] || {};
-        if (!paymentObj.paid) {
-          payments[m] = { paid: true, date: now };
-        }
+    // Mark all months up to selectedMonth as paid
+    for (let m = 1; m <= month; m++) {
+      const paymentObj = payments[m] || {};
+      if (!paymentObj.paid) {
+        payments[m] = { paid: true, date: now };
       }
+    }
 
+    // Handle short payment correction
     if (month > 1 && member.shortPayments?.[month - 1]) {
       const updatedShortPayments = { ...member.shortPayments, [month - 1]: 0 };
-      const updatedMember = { ...member, payments, shortPayments: updatedShortPayments };
+      const updatedMember = {
+        ...member,
+        payments,
+        shortPayments: updatedShortPayments,
+      };
+
       await setDoc(doc(db, `chit-${chitId}-members`, String(member.id)), updatedMember);
-      setMembers((prev) => prev.map((p) => (p.id === member.id ? updatedMember : p)));
-      sendWhatsappNotification(updatedMember); // <-- Call here if you want to notify after short payment fix
+      setMembers((prev) =>
+        prev.map((p) => (p.id === member.id ? updatedMember : p))
+      );
+
+      // ✅ Send WhatsApp notification after short payment fix
+      await sendWhatsappNotification(
+        updatedMember.phone,
+        `Hi ${updatedMember.name}, your pending chit short payment has been cleared for Month ${selectedMonth}. ✅`
+      );
+
       return;
     }
 
+    // Normal monthly payment update
     const updatedMember = { ...member, payments };
     await setDoc(doc(db, `chit-${chitId}-members`, String(member.id)), updatedMember);
-    setMembers((prev) => prev.map((p) => (p.id === member.id ? updatedMember : p)));
-    sendWhatsappNotification(updatedMember); // <-- Call here after normal update
+    setMembers((prev) =>
+      prev.map((p) => (p.id === member.id ? updatedMember : p))
+    );
+
+    // ✅ Send WhatsApp notification after normal payment update
+    await sendWhatsappNotification(
+      updatedMember.phone,
+      `Hi ${updatedMember.name}, your chit payment for Month ${selectedMonth} is marked as PAID. ✅`
+    );
   } catch (err) {
     console.error("togglePayment error:", err);
   }
 };
 
-  const sendWhatsappNotification = (member) => {
-  fetch("https://new-production-f59b.up.railway.app/send-whatsapp", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      phone: member.phone,
-      message: `Your chit payment for Month ${selectedMonth} is marked as paid. Thank you, ${member.name}!`
-    }),
-  });
-}
+// ---- WHATSAPP NOTIFICATION ----
+const sendWhatsappNotification = async (phone, message) => {
+  try {
+    const res = await fetch("https://new-production-f59b.up.railway.app/send-whatsapp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone, message }),
+    });
+
+    if (!res.ok) {
+      const error = await res.text();
+      console.error("WhatsApp API error:", error);
+    } else {
+      const data = await res.json();
+      console.log("✅ WhatsApp message sent successfully:", data);
+    }
+  } catch (err) {
+    console.error("⚠️ Failed to connect to WhatsApp backend:", err);
+  }
+};
+
 
   const updateShortPayment = async (member, month, amount) => {
     try {
