@@ -219,6 +219,8 @@ const togglePayment = async (member) => {
 // ---- WHATSAPP NOTIFICATION ----
 const sendWhatsappNotification = async (phone, message) => {
   try {
+    console.log("📤 Sending WhatsApp message to:", phone, message); // <--- ADD THIS
+
     const res = await fetch("https://new-production-f59b.up.railway.app/send-whatsapp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -227,7 +229,7 @@ const sendWhatsappNotification = async (phone, message) => {
 
     if (!res.ok) {
       const error = await res.text();
-      console.error("WhatsApp API error:", error);
+      console.error("❌ WhatsApp API error:", error);
     } else {
       const data = await res.json();
       console.log("✅ WhatsApp message sent successfully:", data);
