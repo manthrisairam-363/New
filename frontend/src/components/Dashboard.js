@@ -36,7 +36,7 @@ export default function Dashboard({ chitId, onBack }) {
   ];
 
   const MEMBER_PHONES = [
-    "9533126221", "9876543002", "9876543003", "9876543004", "9876543005",
+    "9533126221", "9533126221", "9533357765", "9876543004", "9876543005",
     "9876543006", "9876543007", "9876543008", "9876543009", "9876543010",
     "9876543011", "9876543012", "9876543013", "9876543014", "9876543015",
     "9876543016", "9876543017", "9876543018", "9876543019", "9876543020",
@@ -219,7 +219,7 @@ const togglePayment = async (member) => {
 // ---- WHATSAPP NOTIFICATION ----
 const sendWhatsappNotification = async (member) => {
   try {
-    const response = await fetch("httpshttps://new-production-f59b.up.railway.app/", {
+    const response = await fetch("https://new-production-f59b.up.railway.app/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
