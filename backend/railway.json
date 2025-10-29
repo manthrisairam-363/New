@@ -8,13 +8,13 @@
           "commands": []
         },
         "install": {
-          "commands": ["cd backend && npm install"]
+          "commands": ["npm install"]
         },
         "build": {
           "commands": []
         },
         "start": {
-          "commands": ["cd backend && npm start"]
+          "commands": ["npm start"]
         }
       }
     }
