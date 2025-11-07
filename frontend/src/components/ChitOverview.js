@@ -13,7 +13,7 @@ const ChitOverview = ({ onSelectChit }) => {
       setLoading(true);
       try {
         // Define your 5 chits
-        const chitIds = [1, 2, 3];
+        const chitIds = [1, 2, 3, 4];
         const chitSummaries = [];
 
         for (const chitId of chitIds) {
