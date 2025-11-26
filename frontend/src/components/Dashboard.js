@@ -10,6 +10,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "../firebaseConfig";
+import { apiFetch } from "../api";
 
 export default function Dashboard({ chitId, onBack }) {
 
@@ -219,9 +220,8 @@ const togglePayment = async (member) => {
 // ---- WHATSAPP NOTIFICATION ----
 const sendWhatsappNotification = async (member) => {
   try {
-    const response = await fetch("https://new-production-f59b.up.railway.app/", {
+    const response = await apiFetch("/send-whatsapp", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         phone: member.phone,
         message: `Your chit payment for Month ${selectedMonth} is marked as paid. Thank you, ${member.name}!`
