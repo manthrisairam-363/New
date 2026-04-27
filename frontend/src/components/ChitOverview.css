@@ -1,122 +1,242 @@
-.chit-overview {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
+/* ── ChitOverview ── */
+
+.overview-page {
+  min-height: 100vh;
+  background: var(--bg);
 }
 
-.chit-overview h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  color: #333;
+/* Top header bar */
+.overview-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+.overview-logo {
+  width: 32px;
+  height: 32px;
+  background: var(--primary);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.overview-header h1 {
+  margin: 0;
+  font-size: 1.05em;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.overview-header-sub {
+  font-size: 0.82em;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+/* Main content */
+.chit-overview {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 20px 48px;
+}
+
+.overview-section-title {
+  font-size: 0.78em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 16px;
 }
 
 .chit-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
 }
 
+/* Individual card */
 .chit-card {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--border);
+  overflow: hidden;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  border: 2px solid transparent;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  box-shadow: var(--shadow-sm);
 }
 
 .chit-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  border-color: #007bff;
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+
+/* Colored accent bar at top of each card */
+.chit-card-accent {
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), #818CF8);
+}
+
+.chit-card-body {
+  padding: 18px 20px 16px;
 }
 
 .chit-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .chit-header h3 {
   margin: 0;
-  color: #333;
-  font-size: 1.4em;
+  font-size: 1.1em;
+  font-weight: 700;
+  color: var(--text);
 }
 
 .month-badge {
-  background: #007bff;
-  color: white;
-  padding: 4px 12px;
+  background: var(--primary-light);
+  color: var(--primary);
+  padding: 3px 10px;
   border-radius: 20px;
-  font-size: 0.9em;
-  font-weight: bold;
+  font-size: 0.78em;
+  font-weight: 600;
 }
 
+/* Stats */
 .chit-stats {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .stat {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
-  padding: 8px 0;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border-light);
 }
 
-.stat:last-child {
-  border-bottom: none;
-}
+.stat:last-child { border-bottom: none; }
 
 .stat-label {
-  color: #666;
-  font-size: 0.9em;
+  font-size: 0.85em;
+  color: var(--text-muted);
 }
 
 .stat-value {
-  font-weight: bold;
-  font-size: 1.1em;
+  font-weight: 600;
+  font-size: 0.95em;
+  color: var(--text);
 }
 
-.stat-value.collected {
-  color: #28a745;
+.stat-value.collected { color: var(--success); }
+.stat-value.pending   { color: var(--danger); }
+
+/* Progress bar */
+.chit-progress-wrap {
+  margin-bottom: 14px;
 }
 
-.stat-value.pending {
-  color: #dc3545;
+.chit-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78em;
+  color: var(--text-muted);
+  margin-bottom: 5px;
 }
 
+.chit-progress-bar {
+  height: 5px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.chit-progress-fill {
+  height: 100%;
+  background: var(--success);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+/* Manage button */
 .manage-btn {
   width: 100%;
-  padding: 12px;
-  background: #007bff;
+  padding: 10px;
+  background: var(--primary);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-weight: bold;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.88em;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.15s;
+  letter-spacing: 0.01em;
 }
 
-.manage-btn:hover {
-  background: #0056b3;
-}
+.manage-btn:hover { background: var(--primary-dark); }
 
+/* Loading */
 .loading {
-  text-align: center;
-  padding: 50px;
-  color: #666;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  color: var(--text-muted);
+  gap: 14px;
 }
 
-@media (max-width: 768px) {
-  .chit-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .chit-overview {
-    padding: 15px;
-  }
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Skeleton cards while loading */
+.skeleton-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--border);
+  overflow: hidden;
+  height: 220px;
+}
+
+.skeleton-bar {
+  background: linear-gradient(90deg, var(--border) 25%, var(--border-light) 50%, var(--border) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (max-width: 640px) {
+  .chit-grid { grid-template-columns: 1fr; }
+  .chit-overview { padding: 16px 12px 40px; }
+  .overview-header { padding: 0 16px; }
 }
