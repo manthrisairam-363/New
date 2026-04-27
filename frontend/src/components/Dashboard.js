@@ -1,5 +1,5 @@
 // src/components/Dashboard.js
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import "./Dashboard.css";
 import {
   collection,
@@ -31,10 +31,7 @@ export default function Dashboard({ chitId, onBack }) {
   const [config, setConfig] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editingMembers, setEditingMembers] = useState(false);
-  const [listening, setListening] = useState(false);
-  const [voiceText, setVoiceText] = useState("");
   const [selectedMonth, setSelectedMonth] = useState(null);
-  const recognitionRef = useRef(null);
 
   // ---- TOAST ----
   const [toast, setToast] = useState(null);
@@ -299,31 +296,6 @@ export default function Dashboard({ chitId, onBack }) {
     }
   };
 
-  const startVoiceRecognition = () => {
-    if (!window.webkitSpeechRecognition) {
-      showToast("Voice input only works in Chrome", "error");
-      return;
-    }
-    recognitionRef.current = new window.webkitSpeechRecognition();
-    recognitionRef.current.continuous = false;
-    recognitionRef.current.lang = "en-US";
-    recognitionRef.current.onresult = async (event) => {
-      const spoken = event.results[0][0].transcript;
-      setVoiceText(spoken);
-      const match = spoken.match(/member\s*(\d+)\s*(mark\s)?paid/i);
-      if (match) {
-        const memberId = Number(match[1]);
-        const member = members.find((m) => m.id === memberId);
-        if (member) await togglePayment(member);
-        else showToast(`Member ${memberId} not found`, "error");
-      }
-      setListening(false);
-    };
-    recognitionRef.current.onend = () => setListening(false);
-    recognitionRef.current.start();
-    setListening(true);
-  };
-
   if (loading || selectedMonth === null)
     return <div style={{ padding: 20, textAlign: "center" }}>Loading...</div>;
 
@@ -400,16 +372,6 @@ export default function Dashboard({ chitId, onBack }) {
       </div>
 
       <div className="db-body">
-
-        {/* ---- VOICE ---- */}
-        <button
-          className={`voice-btn${listening ? " active" : ""}`}
-          onClick={startVoiceRecognition}
-          disabled={listening}
-        >
-          {listening ? "🎙️ Listening..." : "🎙️ Voice Update"}
-        </button>
-        {voiceText && <div className="voice-text">Heard: "{voiceText}"</div>}
 
         {/* ---- SUMMARY CARDS ---- */}
         <div className="summary-container">
