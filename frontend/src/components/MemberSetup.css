@@ -1,0 +1,251 @@
+/* MemberSetup.css */
+
+.setup-overlay {
+  min-height: 100vh;
+  background: #f0f2f5;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+}
+
+.setup-card {
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 680px;
+  padding: 32px;
+}
+
+/* Header */
+.setup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.setup-title {
+  font-size: 1.5em;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 4px;
+}
+
+.setup-subtitle {
+  font-size: 0.9em;
+  color: #6c757d;
+  margin: 0;
+}
+
+.setup-cancel-btn {
+  background: none;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.85em;
+  color: #6c757d;
+  cursor: pointer;
+  white-space: nowrap;
+  margin-left: 16px;
+}
+
+.setup-cancel-btn:hover {
+  background: #f8f9fa;
+}
+
+/* Count bar */
+.setup-count-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.setup-count-pill {
+  background: #e8f4fd;
+  color: #0056b3;
+  font-size: 0.82em;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.setup-hint {
+  font-size: 0.82em;
+  color: #adb5bd;
+}
+
+/* Table */
+.setup-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.setup-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+
+.setup-table th {
+  background: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.setup-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+.setup-table tr:last-child td {
+  border-bottom: none;
+}
+
+.setup-table tr:hover td {
+  background: #fafafa;
+}
+
+.setup-num {
+  color: #adb5bd;
+  font-size: 0.85em;
+  text-align: center;
+}
+
+.setup-input {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  font-size: 0.9em;
+  color: #333;
+  background: #fff;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.setup-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.setup-input::placeholder {
+  color: #ced4da;
+}
+
+.setup-del-btn {
+  background: none;
+  border: none;
+  color: #dee2e6;
+  cursor: pointer;
+  font-size: 0.85em;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.setup-del-btn:hover:not(:disabled) {
+  color: #dc3545;
+  background: #fff1f1;
+}
+
+.setup-del-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Add row button */
+.setup-add-row-btn {
+  background: none;
+  border: 1px dashed #007bff;
+  color: #007bff;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 0.88em;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 16px;
+  transition: background 0.15s;
+}
+
+.setup-add-row-btn:hover {
+  background: #e8f4fd;
+}
+
+/* Error */
+.setup-error {
+  background: #fff1f1;
+  color: #dc3545;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 0.88em;
+  margin-bottom: 16px;
+}
+
+/* Footer */
+.setup-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.setup-secondary-btn {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  color: #495057;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.9em;
+  cursor: pointer;
+}
+
+.setup-secondary-btn:hover {
+  background: #e9ecef;
+}
+
+.setup-save-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 0.95em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.setup-save-btn:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.setup-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .setup-card {
+    padding: 20px 16px;
+  }
+  .setup-title {
+    font-size: 1.2em;
+  }
+}
