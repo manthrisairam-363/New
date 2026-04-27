@@ -422,7 +422,7 @@ export default function Dashboard({ chitId, onBack }) {
       </div>
 
       {/* ---- MONTH SELECTOR ---- */}
-      <div className="months-bar" style={{ marginBottom: 24, textAlign: "center", display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
+    <div className="months-bar" style={{ marginBottom: 24, display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "4px" }}>
         {[...Array(TOTAL_MONTHS)].map((_, i) => {
           const monthNum = i + 1;
           const isActive = selectedMonth === monthNum;
@@ -511,28 +511,26 @@ export default function Dashboard({ chitId, onBack }) {
                         </button>
                       ) : (
                         <>
-                          ✅ Paid
-                          {paidDate && (
-                            <span style={{ marginLeft: 6, color: "#6c757d", fontWeight: "normal", fontSize: "0.85em" }}>
-                              ({new Date(paidDate).toLocaleDateString()})
-                            </span>
-                          )}
-                          <button
-                            onClick={() => togglePayment(m)}
-                            style={{
-                              marginLeft: 8,
-                              background: "none",
-                              border: "1px solid #ccc",
-                              borderRadius: 4,
-                              cursor: "pointer",
-                              fontSize: "0.75em",
-                              color: "#999",
-                              padding: "2px 6px",
-                            }}
-                          >
-                            undo
-                          </button>
-                        </>
+<>
+  ✅ Paid
+  {paidDate && (
+    <span style={{ marginLeft: 6, color: "#6c757d", fontWeight: "normal", fontSize: "0.85em" }}>
+      ({new Date(paidDate).toLocaleDateString()})
+    </span>
+  )}
+  {paidDate && (Date.now() - new Date(paidDate).getTime() < 3600000) && (
+    <button
+      onClick={() => togglePayment(m)}
+      style={{
+        marginLeft: 8, background: "none", border: "1px solid #ccc",
+        borderRadius: 4, cursor: "pointer", fontSize: "0.75em",
+        color: "#999", padding: "2px 6px",
+      }}
+    >
+      undo
+    </button>
+  )}
+</>
                       );
                     })()}
                   </td>
