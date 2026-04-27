@@ -511,26 +511,25 @@ export default function Dashboard({ chitId, onBack }) {
                         </button>
                       ) : (
                         <>
-<>
-  ✅ Paid
-  {paidDate && (
-    <span style={{ marginLeft: 6, color: "#6c757d", fontWeight: "normal", fontSize: "0.85em" }}>
-      ({new Date(paidDate).toLocaleDateString()})
-    </span>
-  )}
-  {paidDate && (Date.now() - new Date(paidDate).getTime() < 3600000) && (
-    <button
-      onClick={() => togglePayment(m)}
-      style={{
-        marginLeft: 8, background: "none", border: "1px solid #ccc",
-        borderRadius: 4, cursor: "pointer", fontSize: "0.75em",
-        color: "#999", padding: "2px 6px",
-      }}
-    >
-      undo
-    </button>
-  )}
-</>
+                          ✅ Paid
+                          {paidDate && (
+                            <span style={{ marginLeft: 6, color: "#6c757d", fontWeight: "normal", fontSize: "0.85em" }}>
+                              ({new Date(paidDate).toLocaleDateString()})
+                            </span>
+                          )}
+                          {paidDate && (Date.now() - new Date(paidDate).getTime() < 3600000) && (
+                            <button
+                              onClick={() => togglePayment(m)}
+                              style={{
+                                marginLeft: 8, background: "none", border: "1px solid #ccc",
+                                borderRadius: 4, cursor: "pointer", fontSize: "0.75em",
+                                color: "#999", padding: "2px 6px",
+                              }}
+                            >
+                              undo
+                            </button>
+                          )}
+                        </>
                       );
                     })()}
                   </td>
