@@ -440,3 +440,24 @@ tbody tr:hover td { background: #FAFAFA; }
   .summary { grid-template-columns: 1fr 1fr; gap: 8px; }
   .summary-card strong { font-size: 1.25em; }
 }
+
+
+.btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  width: 26px;
+  height: 26px;
+  background: #DCFCE7;
+  border-radius: 50%;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background 0.15s, transform 0.1s;
+  vertical-align: middle;
+}
+.btn-whatsapp:hover {
+  background: #BBF7D0;
+  transform: scale(1.1);
+}
+
