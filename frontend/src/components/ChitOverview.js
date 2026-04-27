@@ -50,13 +50,11 @@ const ChitOverview = ({ onSelectChit }) => {
   if (loading) {
     return (
       <div className="overview-page">
-        <div className="overview-header">
-          <div className="overview-logo">C</div>
-          <h1>Chitt Tracker</h1>
-        </div>
         <div className="chit-overview">
-          <h2 className="overview-main-title">Chit Fund Management Dashboard</h2>
-        <p className="overview-section-title">Your Chit Funds</p>
+          <div className="overview-page-header">
+            <h2 className="overview-main-title">Chit Fund Management Dashboard</h2>
+            <p className="overview-subtitle">Chitt Tracker · {CHIT_IDS.length} funds</p>
+          </div>
           <div className="chit-grid">
             {CHIT_IDS.map((id) => (
               <div key={id} className="skeleton-card">
@@ -77,14 +75,11 @@ const ChitOverview = ({ onSelectChit }) => {
 
   return (
     <div className="overview-page">
-      <div className="overview-header">
-        <div className="overview-logo">C</div>
-        <h1>Chitt Tracker</h1>
-        <span className="overview-header-sub">· {chits.length} funds</span>
-      </div>
       <div className="chit-overview">
-        <h2 className="overview-main-title">Chit Fund Management Dashboard</h2>
-        <p className="overview-section-title">Your Chit Funds</p>
+        <div className="overview-page-header">
+          <h2 className="overview-main-title">Chit Fund Management Dashboard</h2>
+          <p className="overview-subtitle">Chitt Tracker · {chits.length} funds</p>
+        </div>
         <div className="chit-grid">
           {chits.map((chit) => {
             const progressPct = chit.totalMembers > 0
