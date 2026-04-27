@@ -7,10 +7,17 @@ import "./MemberSetup.css";
 export default function MemberSetup({ chitId, existingMembers = [], onComplete, onCancel }) {
   const isEditing = existingMembers.length > 0;
 
-  // Pre-fill rows if editing existing members
+  // In edit mode: only show rows that have real data (both name + phone filled)
+  // This prevents placeholder "Member X" rows with no phone from polluting the form
+  const realMembers = existingMembers.filter(
+    (m) => m.name && m.phone && m.name.trim() && m.phone.trim()
+      && !/^Member \d+$/.test(m.name.trim())
+  );
+
   const [rows, setRows] = useState(
     isEditing
-      ? existingMembers.map((m) => ({ name: m.name || "", phone: m.phone || "" }))
+      ? [...realMembers.map((m) => ({ name: m.name || "", phone: m.phone || "" })),
+         { name: "", phone: "" }]  // always one empty row at end for adding
       : [{ name: "", phone: "" }]
   );
 
@@ -53,29 +60,23 @@ export default function MemberSetup({ chitId, existingMembers = [], onComplete, 
     setSaving(true);
     setError("");
     try {
-      // If editing, we need to handle members beyond the current list
-      // Build final member list: filled rows get real data, remaining slots keep existing payment data
-      const totalSlots = Math.max(filledRows.length, existingMembers.length, 30);
-
-      for (let i = 0; i < totalSlots; i++) {
-        const existing = existingMembers[i] || {};
-        const newData = filledRows[i];
-
+      // Save only the filled rows as members 1..N
+      // For existing members beyond the new list, preserve their payment data with updated name/phone
+      for (let i = 0; i < filledRows.length; i++) {
+        const existing = existingMembers.find((m) => m.id === i + 1) || {};
         const memberDoc = {
           id: i + 1,
-          name: newData ? newData.name.trim() : (existing.name || `Member ${i + 1}`),
-          phone: newData ? newData.phone.trim() : (existing.phone || ""),
+          name: filledRows[i].name.trim(),
+          phone: filledRows[i].phone.trim(),
           chitMonthPicked: existing.chitMonthPicked ?? null,
           payments: existing.payments || {},
           shortPayments: existing.shortPayments || {},
         };
-
         await setDoc(
           doc(db, `chit-${chitId}-members`, String(i + 1)),
           memberDoc
         );
       }
-
       onComplete();
     } catch (err) {
       console.error("Save members error:", err);
