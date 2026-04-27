@@ -10,7 +10,6 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "../firebaseConfig";
-import { apiFetch } from "../api";
 
 export default function Dashboard({ chitId, onBack }) {
 
@@ -45,12 +44,19 @@ export default function Dashboard({ chitId, onBack }) {
     "9876543026", "9876543027", "9876543028", "9876543029", "9876543030"
   ];
 
+  // ---- TOAST NOTIFICATION (replaces alert() for non-destructive actions) ----
+  const [toast, setToast] = useState(null);
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
   const getMemberDueAmount = (member, currMonth) => {
     let due = 0;
     for (let m = 1; m <= currMonth; m++) {
       const shortPayment = member.shortPayments?.[m] || 0;
       due += shortPayment;
-      if (!member.payments?.[m]) {
+      if (!member.payments?.[m]?.paid) {
         if (member.chitMonthPicked && m >= member.chitMonthPicked) {
           due += AFTER_AMOUNT;
         } else {
@@ -90,7 +96,6 @@ export default function Dashboard({ chitId, onBack }) {
             shortPayments: {},
           }));
           for (const member of initial) {
-            // Write to chit-{chitId}-members
             await setDoc(doc(db, `chit-${chitId}-members`, String(member.id)), member);
           }
           mList = initial;
@@ -111,25 +116,14 @@ export default function Dashboard({ chitId, onBack }) {
         const cSnap = await getDoc(configDocRef);
         let cdata;
         if (!cSnap.exists()) {
-          cdata = {
-            currentMonth: 1,
-            currentReceiver: 1,
-          };
+          cdata = { currentMonth: 1, currentReceiver: 1 };
           await setDoc(configDocRef, cdata);
         } else {
           cdata = cSnap.data();
-          if (
-            !cdata.currentMonth ||
-            cdata.currentMonth < 1 ||
-            cdata.currentMonth > TOTAL_MONTHS
-          ) {
+          if (!cdata.currentMonth || cdata.currentMonth < 1 || cdata.currentMonth > TOTAL_MONTHS) {
             cdata.currentMonth = 1;
           }
-          if (
-            !cdata.currentReceiver ||
-            cdata.currentReceiver < 1 ||
-            cdata.currentReceiver > mList.length
-          ) {
+          if (!cdata.currentReceiver || cdata.currentReceiver < 1 || cdata.currentReceiver > mList.length) {
             cdata.currentReceiver = 1;
           }
           await updateDoc(configDocRef, {
@@ -153,7 +147,7 @@ export default function Dashboard({ chitId, onBack }) {
   const getCurrentReceiverId = () => config?.currentReceiver || 1;
   const getChitAmount = (month) => CHIT_AMOUNTS[month - 1] || CHIT_AMOUNTS[0];
   const countPaidForMonth = (month) =>
-    members.filter((m) => m.payments?.[month]).length;
+    members.filter((m) => m.payments?.[month]?.paid).length;
 
   const getMemberPaymentAmount = (member, currMonth) => {
     if (member.chitMonthPicked && currMonth >= member.chitMonthPicked) {
@@ -162,102 +156,62 @@ export default function Dashboard({ chitId, onBack }) {
     return BEFORE_AMOUNTS[currMonth - 1] || AFTER_AMOUNT;
   };
 
-// ---- TOGGLE PAYMENT ----
-const togglePayment = async (member) => {
-  try {
-    const month = selectedMonth;
-    const now = new Date().toISOString();
-    const payments = { ...member.payments };
+  // ---- TOGGLE PAYMENT (FIXED: only marks the selected month) ----
+  const togglePayment = async (member) => {
+    try {
+      const month = selectedMonth;
+      const now = new Date().toISOString();
+      const payments = { ...member.payments };
+      const isCurrentlyPaid = payments[month]?.paid || false;
 
-    // Mark all months up to selectedMonth as paid
-    for (let m = 1; m <= month; m++) {
-      const paymentObj = payments[m] || {};
-      if (!paymentObj.paid) {
-        payments[m] = { paid: true, date: now };
+      if (!isCurrentlyPaid) {
+        // Mark ONLY the selected month as paid
+        payments[month] = { paid: true, date: now };
+      } else {
+        // Unmark if already paid (toggle off)
+        payments[month] = { paid: false, date: null };
       }
-    }
 
-    // Handle short payment correction
-    if (month > 1 && member.shortPayments?.[month - 1]) {
-      const updatedShortPayments = { ...member.shortPayments, [month - 1]: 0 };
-      const updatedMember = {
-        ...member,
-        payments,
-        shortPayments: updatedShortPayments,
-      };
+      // If there's a short payment from previous month, clear it when marking paid
+      let updatedShortPayments = { ...member.shortPayments };
+      if (!isCurrentlyPaid && month > 1 && updatedShortPayments[month - 1]) {
+        updatedShortPayments[month - 1] = 0;
+      }
 
+      const updatedMember = { ...member, payments, shortPayments: updatedShortPayments };
       await setDoc(doc(db, `chit-${chitId}-members`, String(member.id)), updatedMember);
       setMembers((prev) =>
         prev.map((p) => (p.id === member.id ? updatedMember : p))
       );
 
-      // ✅ Send WhatsApp notification after short payment fix
-      await sendWhatsappNotification(
-        updatedMember.phone,
-        `Hi ${updatedMember.name}, your pending chit short payment has been cleared for Month ${selectedMonth}. ✅`
+      showToast(
+        isCurrentlyPaid
+          ? `${member.name} — Month ${month} marked unpaid`
+          : `✅ ${member.name} — Month ${month} marked paid`
       );
-
-      return;
+    } catch (err) {
+      console.error("togglePayment error:", err);
+      showToast("Failed to update payment", "error");
     }
-
-    // Normal monthly payment update
-    const updatedMember = { ...member, payments };
-    await setDoc(doc(db, `chit-${chitId}-members`, String(member.id)), updatedMember);
-    setMembers((prev) =>
-      prev.map((p) => (p.id === member.id ? updatedMember : p))
-    );
-
-    // ✅ Send WhatsApp notification after normal payment update
-    await sendWhatsappNotification(
-      updatedMember.phone,
-      `Hi ${updatedMember.name}, your chit payment for Month ${selectedMonth} is marked as PAID. ✅`
-    );
-  } catch (err) {
-    console.error("togglePayment error:", err);
-  }
-};
-
-// ---- WHATSAPP NOTIFICATION ----
-const sendWhatsappNotification = async (member) => {
-  try {
-    const response = await apiFetch("/send-whatsapp", {
-      method: "POST",
-      body: JSON.stringify({
-        phone: member.phone,
-        message: `Your chit payment for Month ${selectedMonth} is marked as paid. Thank you, ${member.name}!`
-      }),
-    });
-
-    const data = await response.json();
-    console.log("✅ WhatsApp response:", data);
-  } catch (error) {
-    console.error("❌ WhatsApp notification error:", error);
-  }
-};
+  };
 
   const updateShortPayment = async (member, month, amount) => {
     try {
-      const updatedShortPayments = {
-        ...member.shortPayments,
-        [month]: amount,
-      };
-      const updatedMember = {
-        ...member,
-        shortPayments: updatedShortPayments,
-      };
+      const updatedShortPayments = { ...member.shortPayments, [month]: amount };
+      const updatedMember = { ...member, shortPayments: updatedShortPayments };
       await setDoc(doc(db, `chit-${chitId}-members`, String(member.id)), updatedMember);
       setMembers((prev) =>
         prev.map((p) => (p.id === member.id ? updatedMember : p))
       );
     } catch (error) {
-      console.error("Failed to update short payment,", error);
+      console.error("Failed to update short payment:", error);
     }
   };
 
   const assignChitMonth = async (member, month) => {
     const alreadyPicked = members.some((m) => m.chitMonthPicked === month);
     if (alreadyPicked) {
-      alert(`A member has already picked chit for month ${month}.`);
+      showToast(`Another member already picked chit for month ${month}`, "error");
       return;
     }
     try {
@@ -266,7 +220,7 @@ const sendWhatsappNotification = async (member) => {
       setMembers((prev) =>
         prev.map((p) => (p.id === member.id ? updatedMember : p))
       );
-      alert(`Member ${member.id} picked chit in month ${month}.`);
+      showToast(`${member.name} picked chit for Month ${month} ✅`);
     } catch (err) {
       console.error("assignChitMonth error:", err);
     }
@@ -276,59 +230,56 @@ const sendWhatsappNotification = async (member) => {
     if (!config) return;
     const currMonth = getCurrentMonth();
     if (currMonth >= TOTAL_MONTHS) {
-      alert(`All ${TOTAL_MONTHS} months completed.`);
+      showToast(`All ${TOTAL_MONTHS} months completed.`, "error");
       return;
     }
+    const confirmed = window.confirm(
+      `Advance to Month ${currMonth + 1}? Make sure all Month ${currMonth} payments are recorded.`
+    );
+    if (!confirmed) return;
     try {
       const nextMonth = currMonth + 1;
       const nextReceiver =
-        getCurrentReceiverId() >= members.length
-          ? 1
-          : getCurrentReceiverId() + 1;
+        getCurrentReceiverId() >= members.length ? 1 : getCurrentReceiverId() + 1;
       await updateDoc(configDocRef, {
         currentMonth: nextMonth,
         currentReceiver: nextReceiver,
       });
-      setConfig((prev) => ({
-        ...prev,
-        currentMonth: nextMonth,
-        currentReceiver: nextReceiver,
-      }));
+      setConfig((prev) => ({ ...prev, currentMonth: nextMonth, currentReceiver: nextReceiver }));
       setSelectedMonth(nextMonth);
-      setMembers((prev) =>
-        prev.map((m) => ({
-          ...m,
-          payments: { ...m.payments, [nextMonth]: false },
-        }))
-      );
+      showToast(`Advanced to Month ${nextMonth} ✅`);
     } catch (err) {
-      alert("Failed to advance month.");
+      showToast("Failed to advance month", "error");
     }
   };
 
   const resetThisMonth = async () => {
     const month = selectedMonth;
+    const confirmed = window.confirm(
+      `Reset ALL payments for Month ${month} to unpaid? This cannot be undone.`
+    );
+    if (!confirmed) return;
     try {
       for (const m of members) {
-        const updatedPayments = { ...m.payments, [month]: false };
+        const updatedPayments = { ...m.payments, [month]: { paid: false, date: null } };
         const updatedMember = { ...m, payments: updatedPayments };
         await setDoc(doc(db, `chit-${chitId}-members`, String(m.id)), updatedMember);
       }
       setMembers((prev) =>
         prev.map((m) => ({
           ...m,
-          payments: { ...m.payments, [month]: false },
+          payments: { ...m.payments, [month]: { paid: false, date: null } },
         }))
       );
-      alert(`All payments for month ${month} set to unpaid.`);
+      showToast(`Month ${month} payments reset to unpaid`);
     } catch (err) {
-      alert("Reset failed.");
+      showToast("Reset failed", "error");
     }
   };
 
   const startVoiceRecognition = () => {
     if (!window.webkitSpeechRecognition) {
-      alert("Voice API only supported in Chrome.");
+      showToast("Voice input only works in Chrome", "error");
       return;
     }
     recognitionRef.current = new window.webkitSpeechRecognition();
@@ -342,6 +293,7 @@ const sendWhatsappNotification = async (member) => {
         const memberId = Number(match[1]);
         const member = members.find((m) => m.id === memberId);
         if (member) await togglePayment(member);
+        else showToast(`Member ${memberId} not found`, "error");
       }
       setListening(false);
     };
@@ -351,33 +303,50 @@ const sendWhatsappNotification = async (member) => {
   };
 
   if (loading || selectedMonth === null)
-    return <div style={{ padding: 20 }}>Loading...</div>;
+    return <div style={{ padding: 20, textAlign: "center" }}>Loading...</div>;
 
   const paidCount = countPaidForMonth(selectedMonth);
-
   const totalPerMonth = members.reduce(
-    (sum, m) => sum + getMemberPaymentAmount(m, selectedMonth),
-    0
+    (sum, m) => sum + getMemberPaymentAmount(m, selectedMonth), 0
   );
-
-const collected = members.reduce((sum, m) => {
-  const paid = m.payments?.[selectedMonth]?.paid || false;
-  // Only count if 'Mark Paid' was done
-  if (paid) {
-    const expected = getMemberPaymentAmount(m, selectedMonth);
-    const short = m.shortPayments?.[selectedMonth] || 0;
-    // Don't allow negative collected, so max(0, ...)
-    return sum + Math.max(0, expected - short);
-  }
-  return sum;
-}, 0);
+  const collected = members.reduce((sum, m) => {
+    const paid = m.payments?.[selectedMonth]?.paid || false;
+    if (paid) {
+      const expected = getMemberPaymentAmount(m, selectedMonth);
+      const short = m.shortPayments?.[selectedMonth] || 0;
+      return sum + Math.max(0, expected - short);
+    }
+    return sum;
+  }, 0);
   const pending = totalPerMonth - collected;
-  const alreadyPicked = members.some(
-    (m) => m.chitMonthPicked === selectedMonth
-  );
+  const alreadyPicked = members.some((m) => m.chitMonthPicked === selectedMonth);
 
   return (
     <div className="dashboard">
+
+      {/* ---- TOAST ---- */}
+      {toast && (
+        <div
+          style={{
+            position: "fixed",
+            top: 20,
+            right: 20,
+            zIndex: 1000,
+            background: toast.type === "error" ? "#dc3545" : "#28a745",
+            color: "white",
+            padding: "12px 20px",
+            borderRadius: 8,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+            fontWeight: 600,
+            fontSize: "0.95em",
+            maxWidth: 320,
+          }}
+        >
+          {toast.message}
+        </div>
+      )}
+
+      {/* ---- HEADER ---- */}
       <div style={{ marginBottom: 20 }}>
         <button
           onClick={onBack}
@@ -393,120 +362,106 @@ const collected = members.reduce((sum, m) => {
         >
           ← Back to Overview
         </button>
-        <h2>Chit {chitId} Tracker Dashboard</h2>
+        <h2>Chit {chitId} — Dashboard</h2>
       </div>
-      {/* Voice Input Section */}
+
+      {/* ---- VOICE INPUT ---- */}
       <button
         className={`voice-btn${listening ? " active" : ""}`}
         onClick={startVoiceRecognition}
         disabled={listening}
       >
-        {listening ? "Listening..." : "Voice Update"}
+        {listening ? "🎙️ Listening..." : "🎙️ Voice Update"}
       </button>
       {voiceText && (
-        <div className="voice-text">
-          Heard: "{voiceText}"
-        </div>
+        <div className="voice-text">Heard: "{voiceText}"</div>
       )}
 
-      {/* Summary Card Container */}
+      {/* ---- SUMMARY CARDS ---- */}
       <div className="summary-container">
         <div className="summary">
           <div className="summary-card">
-            <small style={{ color: "#007bff" }}>Current Month Status</small>
-            <strong>Month: {selectedMonth}</strong>
-            <small>
-              Paid: {paidCount} / Unpaid: {members.length - paidCount}
-            </small>
+            <small style={{ color: "#007bff" }}>Month Status</small>
+            <strong>Month {selectedMonth}</strong>
+            <small>Paid: {paidCount} / Unpaid: {members.length - paidCount}</small>
           </div>
-
           <div className="summary-card">
-            <small style={{ color: "#28a745" }}>Collected This Month</small>
-            <strong>₹{collected.toLocaleString()}</strong>
-            <small>Total Expected: ₹{totalPerMonth.toLocaleString()}</small>
+            <small style={{ color: "#28a745" }}>Collected</small>
+            <strong style={{ color: "#28a745" }}>₹{collected.toLocaleString()}</strong>
+            <small>Expected: ₹{totalPerMonth.toLocaleString()}</small>
           </div>
-
           <div className="summary-card" style={{ background: "#fff3cd" }}>
-            <small style={{ color: "#dc3545" }}>Pending Collection</small>
-            <strong style={{ color: "#dc3545" }}>
-              ₹{pending.toLocaleString()}
-            </strong>
-            <small>Due in current month</small>
+            <small style={{ color: "#dc3545" }}>Pending</small>
+            <strong style={{ color: "#dc3545" }}>₹{pending.toLocaleString()}</strong>
+            <small>Due this month</small>
           </div>
-
           <div className="summary-card">
             <small style={{ color: "#6c757d" }}>Current Receiver</small>
             <strong>Member {getCurrentReceiverId()}</strong>
-            <small>
-              Chit Value: ₹{getChitAmount(selectedMonth).toLocaleString()}
-            </small>
+            <small>Chit Value: ₹{getChitAmount(selectedMonth).toLocaleString()}</small>
           </div>
         </div>
 
-        {/* Admin Actions */}
-        <div
-          style={{
-            marginTop: 20,
-            paddingTop: 10,
-            borderTop: "1px solid #eee",
-          }}
-        >
+        {/* ---- ADMIN ACTIONS ---- */}
+        <div style={{ marginTop: 20, paddingTop: 10, borderTop: "1px solid #eee" }}>
           <button
             className="action-button"
             onClick={advanceMonth}
-            style={{ marginRight: 10, backgroundColor: "#ffc107" }}
+            style={{ marginRight: 10, backgroundColor: "#ffc107", color: "#333" }}
           >
-            Advance to Month {getCurrentMonth() + 1}
+            ▶ Advance to Month {getCurrentMonth() + 1}
           </button>
           <button
             className="action-button"
             onClick={resetThisMonth}
             style={{ backgroundColor: "#dc3545" }}
           >
-            Reset Month {selectedMonth} Payments
+            ↺ Reset Month {selectedMonth} Payments
           </button>
         </div>
       </div>
 
-      {/* Months Selector */}
-      <div
-        className="months-bar"
-        style={{ marginBottom: 24, textAlign: "center" }}
-      >
-        {[...Array(TOTAL_MONTHS)].map((_, i) => (
-          <button
-            key={i + 1}
-            onClick={() => setSelectedMonth(i + 1)}
-            style={{
-              margin: "2px",
-              fontWeight: selectedMonth === i + 1 ? "bold" : "normal",
-              background: selectedMonth === i + 1 ? "#007bff" : "#e9ecef",
-              color: selectedMonth === i + 1 ? "white" : "#495057",
-              border: "none",
-              borderRadius: 4,
-              padding: "4px 12px",
-              cursor: "pointer",
-            }}
-          >
-            {i + 1}
-          </button>
-        ))}
+      {/* ---- MONTH SELECTOR ---- */}
+      <div className="months-bar" style={{ marginBottom: 24, textAlign: "center" }}>
+        {[...Array(TOTAL_MONTHS)].map((_, i) => {
+          const monthNum = i + 1;
+          const isActive = selectedMonth === monthNum;
+          const isCurrent = monthNum === getCurrentMonth();
+          return (
+            <button
+              key={monthNum}
+              onClick={() => setSelectedMonth(monthNum)}
+              style={{
+                margin: "2px",
+                fontWeight: isActive ? "bold" : "normal",
+                background: isActive ? "#007bff" : isCurrent ? "#e8f4fd" : "#e9ecef",
+                color: isActive ? "white" : isCurrent ? "#007bff" : "#495057",
+                border: isCurrent && !isActive ? "1px solid #007bff" : "none",
+                borderRadius: 4,
+                padding: "4px 12px",
+                cursor: "pointer",
+              }}
+            >
+              {monthNum}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Main Data Table Card */}
+      {/* ---- PAYMENTS TABLE ---- */}
       <div className="table-card">
         <h3 style={{ marginTop: 0, marginBottom: 20, textAlign: "left" }}>
-          Payment Tracking for Month {selectedMonth}
+          Payment Tracking — Month {selectedMonth}
         </h3>
 
         <table className="members-table">
           <thead>
             <tr>
-              <th>Member ID</th>
+              <th>#</th>
               <th>Name</th>
               <th>Phone</th>
-              <th>Picked Month</th>
-              <th>Payment Due (M{selectedMonth})</th>
+              <th>Chit Picked</th>
+              <th>Due (M{selectedMonth})</th>
               <th>Status</th>
               <th>Short Payment</th>
               <th>Total Due</th>
@@ -514,24 +469,15 @@ const collected = members.reduce((sum, m) => {
           </thead>
           <tbody>
             {members.map((m) => {
-              const prevMonthDue =
-                selectedMonth > 1
-                  ? getMemberDueAmount(m, selectedMonth - 1)
-                  : 0;
+              const prevMonthDue = selectedMonth > 1 ? getMemberDueAmount(m, selectedMonth - 1) : 0;
               const rowClass = prevMonthDue > 0 ? "prev-due" : "";
               const showBadge = prevMonthDue > 0;
-              const isPaid = Boolean(m.payments?.[selectedMonth]);
-
+              const isPaid = Boolean(m.payments?.[selectedMonth]?.paid);
               let statusClass = isPaid ? "paid" : "unpaid";
-              if (m.id === getCurrentReceiverId()) {
-                statusClass = "receiver";
-              }
+              if (m.id === getCurrentReceiverId()) statusClass = "receiver";
 
               return (
-                <tr
-                  key={m.id}
-                  className={`${rowClass} ${statusClass}`}
-                >
+                <tr key={m.id} className={`${rowClass} ${statusClass}`}>
                   <td>{m.id}</td>
                   <td>{m.name}</td>
                   <td>{m.phone}</td>
@@ -546,12 +492,10 @@ const collected = members.reduce((sum, m) => {
                         Pick Now
                       </button>
                     ) : (
-                      "-"
+                      "—"
                     )}
                   </td>
-                  <td>
-                    ₹{getMemberPaymentAmount(m, selectedMonth).toLocaleString()}
-                  </td>
+                  <td>₹{getMemberPaymentAmount(m, selectedMonth).toLocaleString()}</td>
                   <td>
                     {(() => {
                       const paymentObj = m.payments?.[selectedMonth] || {};
@@ -569,17 +513,25 @@ const collected = members.reduce((sum, m) => {
                         <>
                           ✅ Paid
                           {paidDate && (
-                            <span
-                              style={{
-                                marginLeft: 6,
-                                color: "#6c757d",
-                                fontWeight: "normal",
-                                fontSize: "0.85em",
-                              }}
-                            >
+                            <span style={{ marginLeft: 6, color: "#6c757d", fontWeight: "normal", fontSize: "0.85em" }}>
                               ({new Date(paidDate).toLocaleDateString()})
                             </span>
                           )}
+                          <button
+                            onClick={() => togglePayment(m)}
+                            style={{
+                              marginLeft: 8,
+                              background: "none",
+                              border: "1px solid #ccc",
+                              borderRadius: 4,
+                              cursor: "pointer",
+                              fontSize: "0.75em",
+                              color: "#999",
+                              padding: "2px 6px",
+                            }}
+                          >
+                            undo
+                          </button>
                         </>
                       );
                     })()}
@@ -590,18 +542,9 @@ const collected = members.reduce((sum, m) => {
                       min="0"
                       value={m.shortPayments?.[selectedMonth] || 0}
                       onChange={(e) =>
-                        updateShortPayment(
-                          m,
-                          selectedMonth,
-                          parseFloat(e.target.value) || 0
-                        )
+                        updateShortPayment(m, selectedMonth, parseFloat(e.target.value) || 0)
                       }
-                      style={{
-                        width: 80,
-                        padding: 5,
-                        borderRadius: 4,
-                        border: "1px solid #ccc",
-                      }}
+                      style={{ width: 80, padding: 5, borderRadius: 4, border: "1px solid #ccc" }}
                     />
                   </td>
                   <td>
@@ -616,10 +559,10 @@ const collected = members.reduce((sum, m) => {
           </tbody>
         </table>
       </div>
+
       <div style={{ marginTop: 20, color: "#6c757d", fontSize: "0.9em" }}>
         <small>
-          **Important Note:** The "Total Due" column includes any unpaid months'
-          amounts *plus* accumulated short payments up to the selected month.
+          "Total Due" = all unpaid months' amounts + accumulated short payments up to Month {selectedMonth}.
         </small>
       </div>
     </div>
