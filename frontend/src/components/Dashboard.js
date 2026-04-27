@@ -422,7 +422,7 @@ export default function Dashboard({ chitId, onBack }) {
       </div>
 
       {/* ---- MONTH SELECTOR ---- */}
-      <div className="months-bar" style={{ marginBottom: 24, textAlign: "center" }}>
+      <div className="months-bar" style={{ marginBottom: 24, textAlign: "center", display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
         {[...Array(TOTAL_MONTHS)].map((_, i) => {
           const monthNum = i + 1;
           const isActive = selectedMonth === monthNum;
