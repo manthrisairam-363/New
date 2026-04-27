@@ -137,26 +137,31 @@
 
 .summary-card small {
   display: block;
-  font-size: 0.75em;
+  font-size: 0.78em;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-muted);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .summary-card strong {
   display: block;
-  font-size: 1.55em;
+  font-size: 1.7em;
   font-weight: 700;
   color: var(--text);
   line-height: 1.2;
-  margin-bottom: 3px;
+  margin-bottom: 5px;
 }
 
 .summary-card .sub {
-  font-size: 0.78em;
+  font-size: 0.82em;
   color: var(--text-muted);
+}
+
+/* Pending card gets warm background */
+.pending-card {
+  background: var(--warning-light) !important;
 }
 
 /* Admin action bar */
@@ -166,6 +171,7 @@
   flex-wrap: wrap;
   padding-top: 16px;
   border-top: 1px solid var(--border);
+  justify-content: center;
 }
 
 .btn-advance {
@@ -199,24 +205,25 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 14px 16px;
+  padding: 16px;
   margin-bottom: 20px;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   align-items: center;
+  justify-content: center;
   box-shadow: var(--shadow-sm);
 }
 
 .month-btn {
-  min-width: 36px;
-  height: 32px;
-  padding: 0 10px;
+  min-width: 40px;
+  height: 36px;
+  padding: 0 12px;
   border-radius: var(--radius-sm);
   border: 1px solid transparent;
   background: var(--bg);
   color: var(--text-muted);
-  font-size: 0.82em;
+  font-size: 0.88em;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.12s;
