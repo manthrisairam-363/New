@@ -69,7 +69,7 @@ mSnap.forEach((d) => mList.push(d.data()));
 
 ```
     if (mList.length === 0) {
-      // No members yet — MemberSetup will handle creation
+      // No members yet  -  MemberSetup will handle creation
       setMembers([]);
     } else {
       mList = mList
@@ -84,7 +84,7 @@ mSnap.forEach((d) => mList.push(d.data()));
         }))
         .filter((mm) => mm.phone && mm.phone.trim() !== ""); // skip placeholders
       mList.sort((a, b) => a.id - b.id);
-      setMembers(mList); // if all were placeholders, mList=[] → setup screen shows
+      setMembers(mList); // if all were placeholders, mList=[] -> setup screen shows
     }
 
     const cSnap = await getDoc(configDocRef);
@@ -166,8 +166,8 @@ const isCurrentlyPaid = payments[month]?.paid || false;
 
   showToast(
     isCurrentlyPaid
-      ? `${member.name} — Month ${month} marked unpaid`
-      : `✅ ${member.name} — Month ${month} marked paid`
+      ? `${member.name}  -  Month ${month} marked unpaid`
+      : `(done) ${member.name}  -  Month ${month} marked paid`
   );
 } catch (err) {
   console.error("togglePayment error:", err);
@@ -214,7 +214,7 @@ let totalCollected = 0, totalPending = 0, paidCount = 0;
     },
   });
 } catch (err) {
-  // Non-critical — overview will still work, just may show stale data
+  // Non-critical  -  overview will still work, just may show stale data
   console.error("Summary update failed:", err);
 }
 ```
@@ -246,7 +246,7 @@ await setDoc(doc(db, `chit-${chitId}-members`, String(member.id)), updatedMember
 setMembers((prev) =>
 prev.map((p) => (p.id === member.id ? updatedMember : p))
 );
-showToast(`${member.name} picked chit for Month ${month} ✅`);
+showToast(`${member.name} picked chit for Month ${month} (done)`);
 } catch (err) {
 console.error(“assignChitMonth error:”, err);
 }
@@ -275,7 +275,7 @@ const newConfig = { …config, currentMonth: nextMonth, currentReceiver: nextRec
 setConfig(newConfig);
 setSelectedMonth(nextMonth);
 updateOverviewSummary(members, newConfig);
-showToast(`Advanced to Month ${nextMonth} ✅`);
+showToast(`Advanced to Month ${nextMonth} (done)`);
 } catch (err) {
 showToast(“Failed to advance month”, “error”);
 }
@@ -332,7 +332,7 @@ shortPayments: mm.shortPayments || {},
 list.sort((a, b) => a.id - b.id);
 setMembers(list);
 setLoading(false);
-showToast(“Members saved successfully ✅”);
+showToast(“Members saved successfully (done)”);
 });
 }}
 onCancel={members.length > 0 ? () => setEditingMembers(false) : null}
@@ -370,14 +370,14 @@ return (
   {/* ---- STICKY TOP BAR ---- */}
   <div className="db-topbar">
     <button className="db-back-btn" onClick={onBack}>
-      ← Back to Overview
+      <- Back to Overview
     </button>
-    <h2 className="db-title">Chit {chitId} — Dashboard</h2>
+    <h2 className="db-title">Chit {chitId}  -  Dashboard</h2>
     <button
       className={`db-edit-btn ${selectedMonth === 1 ? "prominent" : "subtle"}`}
       onClick={() => setEditingMembers(true)}
     >
-      ✎ {selectedMonth === 1 ? "Set Up / Edit Members" : "Edit Members"}
+      Edit {selectedMonth === 1 ? "Set Up / Edit Members" : "Edit Members"}
     </button>
   </div>
 
@@ -393,27 +393,27 @@ return (
         </div>
         <div className="summary-card">
           <small>Collected This Month</small>
-          <strong style={{ color: "var(--success)" }}>₹{collected.toLocaleString()}</strong>
-          <span className="sub">Total Expected: ₹{totalPerMonth.toLocaleString()}</span>
+          <strong style={{ color: "var(--success)" }}>Rs.{collected.toLocaleString()}</strong>
+          <span className="sub">Total Expected: Rs.{totalPerMonth.toLocaleString()}</span>
         </div>
         <div className="summary-card pending-card">
           <small>Pending Collection</small>
-          <strong style={{ color: "var(--danger)" }}>₹{pending.toLocaleString()}</strong>
+          <strong style={{ color: "var(--danger)" }}>Rs.{pending.toLocaleString()}</strong>
           <span className="sub">Due in current month</span>
         </div>
         <div className="summary-card">
           <small>Current Receiver</small>
           <strong>Member {getCurrentReceiverId()}</strong>
-          <span className="sub">Chit Value: ₹{getChitAmount(selectedMonth).toLocaleString()}</span>
+          <span className="sub">Chit Value: Rs.{getChitAmount(selectedMonth).toLocaleString()}</span>
         </div>
       </div>
 
       <div className="admin-actions">
         <button className="btn-advance" onClick={advanceMonth}>
-          ▶ Advance to Month {getCurrentMonth() + 1}
+          > Advance to Month {getCurrentMonth() + 1}
         </button>
         <button className="btn-reset" onClick={resetThisMonth}>
-          ↺ Reset Month {selectedMonth} Payments
+          Reset Reset Month {selectedMonth} Payments
         </button>
       </div>
     </div>
@@ -438,7 +438,7 @@ return (
     {/* ---- PAYMENTS TABLE ---- */}
     <div className="table-card">
       <div className="table-card-header">
-        <h3>Payment Tracking — Month {selectedMonth}</h3>
+        <h3>Payment Tracking  -  Month {selectedMonth}</h3>
       </div>
       <div className="table-wrap">
         <table>
@@ -475,7 +475,7 @@ return (
                       >
                         {m.phone}
                       </a>
-                    ) : "—"}
+                    ) : " - "}
                   </td>
                   <td>
                     {m.chitMonthPicked ? (
@@ -489,9 +489,9 @@ return (
                       >
                         Pick Now
                       </button>
-                    ) : "—"}
+                    ) : " - "}
                   </td>
-                  <td style={{ fontWeight: 600 }}>₹{getMemberPaymentAmount(m, selectedMonth).toLocaleString()}</td>
+                  <td style={{ fontWeight: 600 }}>Rs.{getMemberPaymentAmount(m, selectedMonth).toLocaleString()}</td>
                   <td>
                     {(() => {
                       const paymentObj = m.payments?.[selectedMonth] || {};
@@ -508,13 +508,13 @@ return (
 
                       const amount = getMemberPaymentAmount(m, selectedMonth);
                       const waMsg = encodeURIComponent(
-                        `Hi ${m.name}, your chit payment for Month ${selectedMonth} (₹${amount.toLocaleString()}) has been received. Thank you! — Chitt Tracker`
+                        `Hi ${m.name}, your chit payment for Month ${selectedMonth} (Rs.${amount.toLocaleString()}) has been received. Thank you!  -  Chitt Tracker`
                       );
                       const waUrl = `https://wa.me/91${m.phone}?text=${waMsg}`;
 
                       return (
                         <span className="status-paid">
-                          ✓ Paid
+                          OK Paid
                           {paidDate && (
                             <span className="status-paid-date">
                               {new Date(paidDate).toLocaleDateString()}
@@ -527,7 +527,7 @@ return (
                             className="btn-whatsapp"
                             title="Send WhatsApp confirmation"
                           >
-                            💬
+                            WA
                           </a>
                           {paidDate && (Date.now() - new Date(paidDate).getTime() < 3600000) && (
                             <button className="btn-undo" onClick={() => togglePayment(m)}>undo</button>
@@ -547,7 +547,7 @@ return (
                   </td>
                   <td>
                     <strong style={{ color: showBadge ? "var(--danger)" : "var(--text)" }}>
-                      ₹{getMemberDueAmount(m, selectedMonth).toLocaleString()}
+                      Rs.{getMemberDueAmount(m, selectedMonth).toLocaleString()}
                     </strong>
                     {showBadge && <span className="due-badge">DUE</span>}
                   </td>
@@ -565,5 +565,7 @@ return (
 
   </div>
 </div>
+```
+
 );
 }
