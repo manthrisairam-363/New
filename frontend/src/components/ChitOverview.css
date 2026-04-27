@@ -5,11 +5,15 @@
   background: var(--bg);
 }
 
-/* Page header - centered, no bar */
+.chit-overview {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 20px 48px;
+}
+
 .overview-page-header {
   text-align: center;
   margin-bottom: 28px;
-  padding-top: 8px;
 }
 
 .overview-main-title {
@@ -24,13 +28,6 @@
   color: var(--text-muted);
   margin: 0;
 }
-  font-size: 0.78em;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin: 0 0 16px;
-}
 
 .chit-grid {
   display: grid;
@@ -38,7 +35,6 @@
   gap: 16px;
 }
 
-/* Individual card */
 .chit-card {
   background: var(--surface);
   border-radius: var(--radius-lg);
@@ -55,7 +51,6 @@
   border-color: var(--primary);
 }
 
-/* Colored accent bar at top of each card */
 .chit-card-accent {
   height: 4px;
   background: linear-gradient(90deg, var(--primary), #818CF8);
@@ -88,10 +83,7 @@
   font-weight: 600;
 }
 
-/* Stats */
-.chit-stats {
-  margin-bottom: 16px;
-}
+.chit-stats { margin-bottom: 16px; }
 
 .stat {
   display: flex;
@@ -103,10 +95,7 @@
 
 .stat:last-child { border-bottom: none; }
 
-.stat-label {
-  font-size: 0.85em;
-  color: var(--text-muted);
-}
+.stat-label { font-size: 0.85em; color: var(--text-muted); }
 
 .stat-value {
   font-weight: 600;
@@ -117,10 +106,7 @@
 .stat-value.collected { color: var(--success); }
 .stat-value.pending   { color: var(--danger); }
 
-/* Progress bar */
-.chit-progress-wrap {
-  margin-bottom: 14px;
-}
+.chit-progress-wrap { margin-bottom: 14px; }
 
 .chit-progress-label {
   display: flex;
@@ -144,7 +130,6 @@
   transition: width 0.4s ease;
 }
 
-/* Manage button */
 .manage-btn {
   width: 100%;
   padding: 10px;
@@ -156,34 +141,10 @@
   font-size: 0.88em;
   cursor: pointer;
   transition: background 0.15s;
-  letter-spacing: 0.01em;
 }
 
 .manage-btn:hover { background: var(--primary-dark); }
 
-/* Loading */
-.loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 20px;
-  color: var(--text-muted);
-  gap: 14px;
-}
-
-.loading-spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid var(--border);
-  border-top-color: var(--primary);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* Skeleton cards while loading */
 .skeleton-card {
   background: var(--surface);
   border-radius: var(--radius-lg);
@@ -207,5 +168,4 @@
 @media (max-width: 640px) {
   .chit-grid { grid-template-columns: 1fr; }
   .chit-overview { padding: 16px 12px 40px; }
-  .overview-header { padding: 0 16px; }
 }
