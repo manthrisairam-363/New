@@ -32,6 +32,9 @@ export default function Dashboard({ chitId, onBack }) {
   const [loading, setLoading] = useState(true);
   const [editingMembers, setEditingMembers] = useState(false);
   const [listening, setListening] = useState(false);
+  const [voiceText, setVoiceText] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState(null);
+  const recognitionRef = useRef(null);
 
   // ---- TOAST ----
   const [toast, setToast] = useState(null);
@@ -55,14 +58,6 @@ export default function Dashboard({ chitId, onBack }) {
     }
     return due;
   };
-
-  const [members, setMembers] = useState([]);
-  const [config, setConfig] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [listening, setListening] = useState(false);
-  const [voiceText, setVoiceText] = useState("");
-  const [selectedMonth, setSelectedMonth] = useState(null);
-  const recognitionRef = useRef(null);
 
   const membersCol = collection(db, `chit-${chitId}-members`);
   const configDocRef = doc(db, `chit-${chitId}-config`, "settings");
