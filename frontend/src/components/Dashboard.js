@@ -457,7 +457,16 @@ export default function Dashboard({ chitId, onBack }) {
                     <tr key={m.id} className={`${rowClass} ${statusClass}`}>
                       <td><strong>{m.id}</strong></td>
                       <td style={{ textAlign: "left", fontWeight: 500 }}>{m.name}</td>
-                      <td style={{ color: "var(--text-muted)", fontSize: "0.85em" }}>{m.phone}</td>
+                      <td style={{ fontSize: "0.85em" }}>
+                        {m.phone ? (
+                          <a
+                            href={`tel:${m.phone}`}
+                            style={{ color: "var(--text-muted)", textDecoration: "underline", textDecorationColor: "var(--border)" }}
+                          >
+                            {m.phone}
+                          </a>
+                        ) : "—"}
+                      </td>
                       <td>
                         {m.chitMonthPicked ? (
                           <span style={{ fontSize: "0.85em", color: "var(--warning)", fontWeight: 600 }}>
@@ -521,9 +530,7 @@ export default function Dashboard({ chitId, onBack }) {
         </div>
 
         <div style={{ marginTop: 16, color: "var(--text-muted)", fontSize: "0.85em", textAlign: "center" }}>
-          <small>
-            **Note:** "Total Due" includes all unpaid months' amounts + accumulated short payments up to Month {selectedMonth}.
-          </small>
+          Note: "Total Due" includes all unpaid months' amounts + accumulated short payments up to Month {selectedMonth}.
         </div>
 
       </div>
