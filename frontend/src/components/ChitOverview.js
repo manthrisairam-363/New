@@ -55,7 +55,8 @@ const ChitOverview = ({ onSelectChit }) => {
           <h1>Chitt Tracker</h1>
         </div>
         <div className="chit-overview">
-          <p className="overview-section-title">Your Chit Funds</p>
+          <h2 className="overview-main-title">Chit Fund Management Dashboard</h2>
+        <p className="overview-section-title">Your Chit Funds</p>
           <div className="chit-grid">
             {CHIT_IDS.map((id) => (
               <div key={id} className="skeleton-card">
@@ -82,6 +83,7 @@ const ChitOverview = ({ onSelectChit }) => {
         <span className="overview-header-sub">· {chits.length} funds</span>
       </div>
       <div className="chit-overview">
+        <h2 className="overview-main-title">Chit Fund Management Dashboard</h2>
         <p className="overview-section-title">Your Chit Funds</p>
         <div className="chit-grid">
           {chits.map((chit) => {
