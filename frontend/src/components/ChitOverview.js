@@ -14,16 +14,13 @@ const ChitOverview = ({ onSelectChit }) => {
     const fetchChitSummaries = async () => {
       setLoading(true);
       try {
-        // Only read 6 config documents — no member reads needed
         const summaries = await Promise.all(
           CHIT_IDS.map(async (chitId) => {
             try {
               const configRef = doc(db, `chit-${chitId}-config`, "settings");
               const snap = await getDoc(configRef);
-
               if (snap.exists()) {
                 const data = snap.data();
-                // Use cached summary if available, otherwise show defaults
                 const summary = data.summary || {};
                 return {
                   id: chitId,
@@ -31,28 +28,12 @@ const ChitOverview = ({ onSelectChit }) => {
                   totalCollected: summary.totalCollected || 0,
                   totalPending: summary.totalPending || 0,
                   paidCount: summary.paidCount || 0,
-                  totalMembers: summary.totalMembers || 30,
-                };
-              } else {
-                // Config doesn't exist yet — chit not opened
-                return {
-                  id: chitId,
-                  currentMonth: 1,
-                  totalCollected: 0,
-                  totalPending: 0,
-                  paidCount: 0,
-                  totalMembers: 30,
+                  totalMembers: summary.totalMembers || 0,
                 };
               }
+              return { id: chitId, currentMonth: 1, totalCollected: 0, totalPending: 0, paidCount: 0, totalMembers: 0 };
             } catch {
-              return {
-                id: chitId,
-                currentMonth: 1,
-                totalCollected: 0,
-                totalPending: 0,
-                paidCount: 0,
-                totalMembers: 30,
-              };
+              return { id: chitId, currentMonth: 1, totalCollected: 0, totalPending: 0, paidCount: 0, totalMembers: 0 };
             }
           })
         );
@@ -63,50 +44,82 @@ const ChitOverview = ({ onSelectChit }) => {
         setLoading(false);
       }
     };
-
     fetchChitSummaries();
   }, []);
 
   if (loading) {
     return (
-      <div className="loading">
-        <div className="loading-spinner" />
-        <p>Loading...</p>
+      <div className="overview-page">
+        <div className="overview-header">
+          <div className="overview-logo">C</div>
+          <h1>Chitt Tracker</h1>
+        </div>
+        <div className="chit-overview">
+          <p className="overview-section-title">Your Chit Funds</p>
+          <div className="chit-grid">
+            {CHIT_IDS.map((id) => (
+              <div key={id} className="skeleton-card">
+                <div style={{ height: 4, background: "#E2E8F0" }} />
+                <div style={{ padding: 18 }}>
+                  <div className="skeleton-bar" style={{ height: 14, width: "50%", marginBottom: 12 }} />
+                  <div className="skeleton-bar" style={{ height: 10, width: "80%", marginBottom: 8 }} />
+                  <div className="skeleton-bar" style={{ height: 10, width: "65%", marginBottom: 8 }} />
+                  <div className="skeleton-bar" style={{ height: 10, width: "70%" }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="chit-overview">
-      <h2>Chit Fund Management Dashboard</h2>
-      <div className="chit-grid">
-        {chits.map((chit) => (
-          <div key={chit.id} className="chit-card" onClick={() => onSelectChit(chit.id)}>
-            <div className="chit-header">
-              <h3>Chit {chit.id}</h3>
-              <span className="month-badge">Month {chit.currentMonth}</span>
-            </div>
-
-            <div className="chit-stats">
-              <div className="stat">
-                <span className="stat-label">Total Collected</span>
-                <span className="stat-value collected">₹{chit.totalCollected.toLocaleString()}</span>
+    <div className="overview-page">
+      <div className="overview-header">
+        <div className="overview-logo">C</div>
+        <h1>Chitt Tracker</h1>
+        <span className="overview-header-sub">· {chits.length} funds</span>
+      </div>
+      <div className="chit-overview">
+        <p className="overview-section-title">Your Chit Funds</p>
+        <div className="chit-grid">
+          {chits.map((chit) => {
+            const progressPct = chit.totalMembers > 0
+              ? Math.round((chit.paidCount / chit.totalMembers) * 100) : 0;
+            return (
+              <div key={chit.id} className="chit-card" onClick={() => onSelectChit(chit.id)}>
+                <div className="chit-card-accent" />
+                <div className="chit-card-body">
+                  <div className="chit-header">
+                    <h3>Chit {chit.id}</h3>
+                    <span className="month-badge">Month {chit.currentMonth}</span>
+                  </div>
+                  <div className="chit-stats">
+                    <div className="stat">
+                      <span className="stat-label">Collected</span>
+                      <span className="stat-value collected">₹{chit.totalCollected.toLocaleString()}</span>
+                    </div>
+                    <div className="stat">
+                      <span className="stat-label">Pending</span>
+                      <span className="stat-value pending">₹{chit.totalPending.toLocaleString()}</span>
+                    </div>
+                  </div>
+                  <div className="chit-progress-wrap">
+                    <div className="chit-progress-label">
+                      <span>Paid this month</span>
+                      <span>{chit.paidCount} / {chit.totalMembers || 30}</span>
+                    </div>
+                    <div className="chit-progress-bar">
+                      <div className="chit-progress-fill" style={{ width: `${progressPct}%` }} />
+                    </div>
+                  </div>
+                  <button className="manage-btn">Manage This Chit →</button>
+                </div>
               </div>
-              <div className="stat">
-                <span className="stat-label">Pending Collection</span>
-                <span className="stat-value pending">₹{chit.totalPending.toLocaleString()}</span>
-              </div>
-              <div className="stat">
-                <span className="stat-label">Paid This Month</span>
-                <span className="stat-value">{chit.paidCount} / {chit.totalMembers}</span>
-              </div>
-            </div>
-
-            <div className="chit-actions">
-              <button className="manage-btn">Manage This Chit →</button>
-            </div>
-          </div>
-        ))}
+            );
+          })}
+        </div>
       </div>
     </div>
   );
