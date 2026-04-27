@@ -74,17 +74,19 @@ export default function Dashboard({ chitId, onBack }) {
           // No members yet — MemberSetup will handle creation
           setMembers([]);
         } else {
-          mList = mList.map((mm) => ({
-            ...mm,
-            name: mm.name || `Member ${mm.id}`,
-            phone: mm.phone || "",
-            chitMonthPicked:
-              typeof mm.chitMonthPicked === "number" ? mm.chitMonthPicked : null,
-            payments: mm.payments || {},
-            shortPayments: mm.shortPayments || {},
-          }));
+          mList = mList
+            .map((mm) => ({
+              ...mm,
+              name: mm.name || `Member ${mm.id}`,
+              phone: mm.phone || "",
+              chitMonthPicked:
+                typeof mm.chitMonthPicked === "number" ? mm.chitMonthPicked : null,
+              payments: mm.payments || {},
+              shortPayments: mm.shortPayments || {},
+            }))
+            .filter((mm) => mm.phone && mm.phone.trim() !== ""); // skip placeholders
           mList.sort((a, b) => a.id - b.id);
-          setMembers(mList);
+          setMembers(mList); // if all were placeholders, mList=[] → setup screen shows
         }
 
         const cSnap = await getDoc(configDocRef);
