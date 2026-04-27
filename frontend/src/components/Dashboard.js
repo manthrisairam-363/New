@@ -133,6 +133,8 @@ export default function Dashboard({ chitId, onBack }) {
         }
         setConfig(cdata);
         setSelectedMonth(cdata.currentMonth || 1);
+        // Seed overview summary so ChitOverview loads fast next time
+        setTimeout(() => updateOverviewSummary(mList, cdata), 500);
       } catch (err) {
         console.error("Fetch error:", err);
       } finally {
@@ -180,9 +182,10 @@ export default function Dashboard({ chitId, onBack }) {
 
       const updatedMember = { ...member, payments, shortPayments: updatedShortPayments };
       await setDoc(doc(db, `chit-${chitId}-members`, String(member.id)), updatedMember);
-      setMembers((prev) =>
-        prev.map((p) => (p.id === member.id ? updatedMember : p))
-      );
+      const newMembers = members.map((p) => (p.id === member.id ? updatedMember : p));
+      setMembers(newMembers);
+      // Keep overview summary in sync
+      updateOverviewSummary(newMembers, config);
 
       showToast(
         isCurrentlyPaid
@@ -192,6 +195,47 @@ export default function Dashboard({ chitId, onBack }) {
     } catch (err) {
       console.error("togglePayment error:", err);
       showToast("Failed to update payment", "error");
+    }
+  };
+
+  // ---- UPDATE OVERVIEW SUMMARY (so ChitOverview loads fast) ----
+  const updateOverviewSummary = async (updatedMembers, currentConfig) => {
+    try {
+      const currMonth = currentConfig?.currentMonth || 1;
+      const BEFORE_AMT = [
+        17700,17700,17500,17500,17300,17300,17100,17100,16800,16800,16500,
+        16500,16000,16000,15500,15000,14500,14000,13500,13000,12500,12000,
+        11500,11000,10500,9500,9000,9000,9000,19500,
+      ];
+      const AFT = 19500;
+      let totalCollected = 0, totalPending = 0, paidCount = 0;
+
+      updatedMembers.forEach((member) => {
+        for (let month = 1; month <= currMonth; month++) {
+          const expected = member.chitMonthPicked && month >= member.chitMonthPicked
+            ? AFT : (BEFORE_AMT[month - 1] || AFT);
+          const paid = member.payments?.[month]?.paid || false;
+          const short = member.shortPayments?.[month] || 0;
+          if (paid) {
+            totalCollected += Math.max(0, expected - short);
+            totalPending += short;
+          } else {
+            totalPending += expected;
+          }
+        }
+        if (member.payments?.[currMonth]?.paid) paidCount++;
+      });
+
+      await updateDoc(configDocRef, {
+        summary: {
+          totalCollected, totalPending, paidCount,
+          totalMembers: updatedMembers.length,
+          lastUpdated: new Date().toISOString(),
+        },
+      });
+    } catch (err) {
+      // Non-critical — overview will still work, just may show stale data
+      console.error("Summary update failed:", err);
     }
   };
 
@@ -245,8 +289,10 @@ export default function Dashboard({ chitId, onBack }) {
         currentMonth: nextMonth,
         currentReceiver: nextReceiver,
       });
-      setConfig((prev) => ({ ...prev, currentMonth: nextMonth, currentReceiver: nextReceiver }));
+      const newConfig = { ...config, currentMonth: nextMonth, currentReceiver: nextReceiver };
+      setConfig(newConfig);
       setSelectedMonth(nextMonth);
+      updateOverviewSummary(members, newConfig);
       showToast(`Advanced to Month ${nextMonth} ✅`);
     } catch (err) {
       showToast("Failed to advance month", "error");
@@ -265,12 +311,12 @@ export default function Dashboard({ chitId, onBack }) {
         const updatedMember = { ...m, payments: updatedPayments };
         await setDoc(doc(db, `chit-${chitId}-members`, String(m.id)), updatedMember);
       }
-      setMembers((prev) =>
-        prev.map((m) => ({
-          ...m,
-          payments: { ...m.payments, [month]: { paid: false, date: null } },
-        }))
-      );
+      const resetMembers = members.map((m) => ({
+        ...m,
+        payments: { ...m.payments, [month]: { paid: false, date: null } },
+      }));
+      setMembers(resetMembers);
+      updateOverviewSummary(resetMembers, config);
       showToast(`Month ${month} payments reset to unpaid`);
     } catch (err) {
       showToast("Reset failed", "error");
