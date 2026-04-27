@@ -388,9 +388,9 @@ export default function Dashboard({ chitId, onBack }) {
       {/* ---- STICKY TOP BAR ---- */}
       <div className="db-topbar">
         <button className="db-back-btn" onClick={onBack}>
-          ← Overview
+          ← Back to Overview
         </button>
-        <h2 className="db-title">Chit {chitId}</h2>
+        <h2 className="db-title">Chit {chitId} — Dashboard</h2>
         <button
           className={`db-edit-btn ${selectedMonth === 1 ? "prominent" : "subtle"}`}
           onClick={() => setEditingMembers(true)}
@@ -415,24 +415,24 @@ export default function Dashboard({ chitId, onBack }) {
         <div className="summary-container">
           <div className="summary">
             <div className="summary-card">
-              <small>Month</small>
-              <strong>{selectedMonth}</strong>
-              <span className="sub">Paid {paidCount} · Unpaid {members.length - paidCount}</span>
+              <small>Month Status</small>
+              <strong>Month {selectedMonth}</strong>
+              <span className="sub">Paid: {paidCount} / Unpaid: {members.length - paidCount}</span>
             </div>
             <div className="summary-card">
-              <small>Collected</small>
+              <small>Collected This Month</small>
               <strong style={{ color: "var(--success)" }}>₹{collected.toLocaleString()}</strong>
-              <span className="sub">of ₹{totalPerMonth.toLocaleString()}</span>
+              <span className="sub">Total Expected: ₹{totalPerMonth.toLocaleString()}</span>
             </div>
-            <div className="summary-card">
-              <small>Pending</small>
+            <div className="summary-card pending-card">
+              <small>Pending Collection</small>
               <strong style={{ color: "var(--danger)" }}>₹{pending.toLocaleString()}</strong>
-              <span className="sub">Due this month</span>
+              <span className="sub">Due in current month</span>
             </div>
             <div className="summary-card">
-              <small>Receiver</small>
+              <small>Current Receiver</small>
               <strong>Member {getCurrentReceiverId()}</strong>
-              <span className="sub">₹{getChitAmount(selectedMonth).toLocaleString()}</span>
+              <span className="sub">Chit Value: ₹{getChitAmount(selectedMonth).toLocaleString()}</span>
             </div>
           </div>
 
@@ -441,7 +441,7 @@ export default function Dashboard({ chitId, onBack }) {
               ▶ Advance to Month {getCurrentMonth() + 1}
             </button>
             <button className="btn-reset" onClick={resetThisMonth}>
-              ↺ Reset Month {selectedMonth}
+              ↺ Reset Month {selectedMonth} Payments
             </button>
           </div>
         </div>
@@ -476,9 +476,9 @@ export default function Dashboard({ chitId, onBack }) {
                   <th>Name</th>
                   <th>Phone</th>
                   <th>Chit Picked</th>
-                  <th>Due</th>
+                  <th>Due (M{selectedMonth})</th>
                   <th>Status</th>
-                  <th>Short Pay</th>
+                  <th>Short Payment</th>
                   <th>Total Due</th>
                 </tr>
               </thead>
@@ -498,7 +498,7 @@ export default function Dashboard({ chitId, onBack }) {
                       <td style={{ color: "var(--text-muted)", fontSize: "0.85em" }}>{m.phone}</td>
                       <td>
                         {m.chitMonthPicked ? (
-                          <span style={{ fontSize: "0.82em", color: "var(--warning)", fontWeight: 600 }}>
+                          <span style={{ fontSize: "0.85em", color: "var(--warning)", fontWeight: 600 }}>
                             Month {m.chitMonthPicked}
                           </span>
                         ) : !alreadyPicked ? (
@@ -556,9 +556,12 @@ export default function Dashboard({ chitId, onBack }) {
               </tbody>
             </table>
           </div>
-          <div className="table-note">
-            "Total Due" = all unpaid months + short payments accumulated up to Month {selectedMonth}
-          </div>
+        </div>
+
+        <div style={{ marginTop: 16, color: "var(--text-muted)", fontSize: "0.85em", textAlign: "center" }}>
+          <small>
+            **Note:** "Total Due" includes all unpaid months' amounts + accumulated short payments up to Month {selectedMonth}.
+          </small>
         </div>
 
       </div>
