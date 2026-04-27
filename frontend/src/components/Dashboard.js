@@ -10,6 +10,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "../firebaseConfig";
+import MemberSetup from "./MemberSetup";
 
 export default function Dashboard({ chitId, onBack }) {
 
@@ -26,25 +27,13 @@ export default function Dashboard({ chitId, onBack }) {
     505000, 510000, 515000, 520000, 525000, 530000, 535000, 540000, 545000, 550000,
   ];
 
-  const MEMBER_NAMES = [
-    "Sairam", "Arun", "Adhvaith", "Apoorva", "ramu",
-    "Member 6", "Member 7", "Member 8", "Member 9", "Member 10",
-    "Member 11", "Member 12", "Member 13", "Member 14", "Member 15",
-    "Member 16", "Member 17", "Member 18", "Member 19", "Member 20",
-    "Member 21", "Member 22", "Member 23", "Member 24", "Member 25",
-    "Member 26", "Member 27", "Member 28", "Member 29", "Member 30"
-  ];
+  const [members, setMembers] = useState([]);
+  const [config, setConfig] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [editingMembers, setEditingMembers] = useState(false);
+  const [listening, setListening] = useState(false);
 
-  const MEMBER_PHONES = [
-    "9533126221", "9533126221", "9533357765", "9876543004", "9876543005",
-    "9876543006", "9876543007", "9876543008", "9876543009", "9876543010",
-    "9876543011", "9876543012", "9876543013", "9876543014", "9876543015",
-    "9876543016", "9876543017", "9876543018", "9876543019", "9876543020",
-    "9876543021", "9876543022", "9876543023", "9876543024", "9876543025",
-    "9876543026", "9876543027", "9876543028", "9876543029", "9876543030"
-  ];
-
-  // ---- TOAST NOTIFICATION (replaces alert() for non-destructive actions) ----
+  // ---- TOAST ----
   const [toast, setToast] = useState(null);
   const showToast = (message, type = "success") => {
     setToast({ message, type });
@@ -87,31 +76,21 @@ export default function Dashboard({ chitId, onBack }) {
         mSnap.forEach((d) => mList.push(d.data()));
 
         if (mList.length === 0) {
-          const initial = Array.from({ length: TOTAL_MONTHS }, (_, i) => ({
-            id: i + 1,
-            name: MEMBER_NAMES[i] || `Member ${i + 1}`,
-            phone: MEMBER_PHONES[i] || "",
-            chitMonthPicked: null,
-            payments: {},
-            shortPayments: {},
-          }));
-          for (const member of initial) {
-            await setDoc(doc(db, `chit-${chitId}-members`, String(member.id)), member);
-          }
-          mList = initial;
+          // No members yet — MemberSetup will handle creation
+          setMembers([]);
         } else {
-          mList = mList.map((mm, idx) => ({
+          mList = mList.map((mm) => ({
             ...mm,
-            name: mm.name || MEMBER_NAMES[idx] || `Member ${idx + 1}`,
-            phone: mm.phone || MEMBER_PHONES[idx] || "",
+            name: mm.name || `Member ${mm.id}`,
+            phone: mm.phone || "",
             chitMonthPicked:
               typeof mm.chitMonthPicked === "number" ? mm.chitMonthPicked : null,
             payments: mm.payments || {},
             shortPayments: mm.shortPayments || {},
           }));
+          mList.sort((a, b) => a.id - b.id);
+          setMembers(mList);
         }
-        mList.sort((a, b) => a.id - b.id);
-        setMembers(mList);
 
         const cSnap = await getDoc(configDocRef);
         let cdata;
@@ -351,6 +330,38 @@ export default function Dashboard({ chitId, onBack }) {
   if (loading || selectedMonth === null)
     return <div style={{ padding: 20, textAlign: "center" }}>Loading...</div>;
 
+  // ---- SHOW MEMBER SETUP if no members yet ----
+  if (members.length === 0 || editingMembers) {
+    return (
+      <MemberSetup
+        chitId={chitId}
+        existingMembers={editingMembers ? members : []}
+        onComplete={() => {
+          setEditingMembers(false);
+          setLoading(true);
+          // Re-fetch members after setup
+          getDocs(collection(db, `chit-${chitId}-members`)).then((snap) => {
+            let list = [];
+            snap.forEach((d) => list.push(d.data()));
+            list = list.map((mm) => ({
+              ...mm,
+              name: mm.name || `Member ${mm.id}`,
+              phone: mm.phone || "",
+              chitMonthPicked: typeof mm.chitMonthPicked === "number" ? mm.chitMonthPicked : null,
+              payments: mm.payments || {},
+              shortPayments: mm.shortPayments || {},
+            }));
+            list.sort((a, b) => a.id - b.id);
+            setMembers(list);
+            setLoading(false);
+            showToast("Members saved successfully ✅");
+          });
+        }}
+        onCancel={members.length > 0 ? () => setEditingMembers(false) : null}
+      />
+    );
+  }
+
   const paidCount = countPaidForMonth(selectedMonth);
   const totalPerMonth = members.reduce(
     (sum, m) => sum + getMemberPaymentAmount(m, selectedMonth), 0
@@ -394,21 +405,30 @@ export default function Dashboard({ chitId, onBack }) {
 
       {/* ---- HEADER ---- */}
       <div style={{ marginBottom: 20 }}>
-        <button
-          onClick={onBack}
-          style={{
-            background: "#6c757d",
-            color: "white",
-            border: "none",
-            padding: "8px 16px",
-            borderRadius: "4px",
-            cursor: "pointer",
-            marginBottom: "10px",
-          }}
-        >
-          ← Back to Overview
-        </button>
-        <h2>Chit {chitId} — Dashboard</h2>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+          <button
+            onClick={onBack}
+            style={{ background: "#6c757d", color: "white", border: "none", padding: "8px 16px", borderRadius: "4px", cursor: "pointer" }}
+          >
+            ← Back to Overview
+          </button>
+          <button
+            onClick={() => setEditingMembers(true)}
+            style={{
+              background: selectedMonth === 1 ? "#007bff" : "none",
+              color: selectedMonth === 1 ? "white" : "#6c757d",
+              border: selectedMonth === 1 ? "none" : "1px solid #dee2e6",
+              padding: "8px 16px",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontSize: selectedMonth === 1 ? "0.95em" : "0.85em",
+              fontWeight: selectedMonth === 1 ? 600 : 400,
+            }}
+          >
+            {selectedMonth === 1 ? "✎ Set Up / Edit Members" : "✎ Edit Members"}
+          </button>
+        </div>
+        <h2 style={{ marginTop: 12 }}>Chit {chitId} — Dashboard</h2>
       </div>
 
       {/* ---- VOICE INPUT ---- */}
