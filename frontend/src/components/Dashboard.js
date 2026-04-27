@@ -380,250 +380,187 @@ export default function Dashboard({ chitId, onBack }) {
 
       {/* ---- TOAST ---- */}
       {toast && (
-        <div
-          style={{
-            position: "fixed",
-            top: 20,
-            right: 20,
-            zIndex: 1000,
-            background: toast.type === "error" ? "#dc3545" : "#28a745",
-            color: "white",
-            padding: "12px 20px",
-            borderRadius: 8,
-            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-            fontWeight: 600,
-            fontSize: "0.95em",
-            maxWidth: 320,
-          }}
-        >
+        <div className={`toast ${toast.type === "error" ? "error" : "success"}`}>
           {toast.message}
         </div>
       )}
 
-      {/* ---- HEADER ---- */}
-      <div style={{ marginBottom: 20 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
-          <button
-            onClick={onBack}
-            style={{ background: "#6c757d", color: "white", border: "none", padding: "8px 16px", borderRadius: "4px", cursor: "pointer" }}
-          >
-            ← Back to Overview
-          </button>
-          <button
-            onClick={() => setEditingMembers(true)}
-            style={{
-              background: selectedMonth === 1 ? "#007bff" : "none",
-              color: selectedMonth === 1 ? "white" : "#6c757d",
-              border: selectedMonth === 1 ? "none" : "1px solid #dee2e6",
-              padding: "8px 16px",
-              borderRadius: "6px",
-              cursor: "pointer",
-              fontSize: selectedMonth === 1 ? "0.95em" : "0.85em",
-              fontWeight: selectedMonth === 1 ? 600 : 400,
-            }}
-          >
-            {selectedMonth === 1 ? "✎ Set Up / Edit Members" : "✎ Edit Members"}
-          </button>
-        </div>
-        <h2 style={{ marginTop: 12 }}>Chit {chitId} — Dashboard</h2>
+      {/* ---- STICKY TOP BAR ---- */}
+      <div className="db-topbar">
+        <button className="db-back-btn" onClick={onBack}>
+          ← Overview
+        </button>
+        <h2 className="db-title">Chit {chitId}</h2>
+        <button
+          className={`db-edit-btn ${selectedMonth === 1 ? "prominent" : "subtle"}`}
+          onClick={() => setEditingMembers(true)}
+        >
+          ✎ {selectedMonth === 1 ? "Set Up / Edit Members" : "Edit Members"}
+        </button>
       </div>
 
-      {/* ---- VOICE INPUT ---- */}
-      <button
-        className={`voice-btn${listening ? " active" : ""}`}
-        onClick={startVoiceRecognition}
-        disabled={listening}
-      >
-        {listening ? "🎙️ Listening..." : "🎙️ Voice Update"}
-      </button>
-      {voiceText && (
-        <div className="voice-text">Heard: "{voiceText}"</div>
-      )}
+      <div className="db-body">
 
-      {/* ---- SUMMARY CARDS ---- */}
-      <div className="summary-container">
-        <div className="summary">
-          <div className="summary-card">
-            <small style={{ color: "#007bff" }}>Month Status</small>
-            <strong>Month {selectedMonth}</strong>
-            <small>Paid: {paidCount} / Unpaid: {members.length - paidCount}</small>
-          </div>
-          <div className="summary-card">
-            <small style={{ color: "#28a745" }}>Collected</small>
-            <strong style={{ color: "#28a745" }}>₹{collected.toLocaleString()}</strong>
-            <small>Expected: ₹{totalPerMonth.toLocaleString()}</small>
-          </div>
-          <div className="summary-card" style={{ background: "#fff3cd" }}>
-            <small style={{ color: "#dc3545" }}>Pending</small>
-            <strong style={{ color: "#dc3545" }}>₹{pending.toLocaleString()}</strong>
-            <small>Due this month</small>
-          </div>
-          <div className="summary-card">
-            <small style={{ color: "#6c757d" }}>Current Receiver</small>
-            <strong>Member {getCurrentReceiverId()}</strong>
-            <small>Chit Value: ₹{getChitAmount(selectedMonth).toLocaleString()}</small>
-          </div>
-        </div>
+        {/* ---- VOICE ---- */}
+        <button
+          className={`voice-btn${listening ? " active" : ""}`}
+          onClick={startVoiceRecognition}
+          disabled={listening}
+        >
+          {listening ? "🎙️ Listening..." : "🎙️ Voice Update"}
+        </button>
+        {voiceText && <div className="voice-text">Heard: "{voiceText}"</div>}
 
-        {/* ---- ADMIN ACTIONS ---- */}
-        <div style={{ marginTop: 20, paddingTop: 10, borderTop: "1px solid #eee" }}>
-          <button
-            className="action-button"
-            onClick={advanceMonth}
-            style={{ marginRight: 10, backgroundColor: "#ffc107", color: "#333" }}
-          >
-            ▶ Advance to Month {getCurrentMonth() + 1}
-          </button>
-          <button
-            className="action-button"
-            onClick={resetThisMonth}
-            style={{ backgroundColor: "#dc3545" }}
-          >
-            ↺ Reset Month {selectedMonth} Payments
-          </button>
-        </div>
-      </div>
+        {/* ---- SUMMARY CARDS ---- */}
+        <div className="summary-container">
+          <div className="summary">
+            <div className="summary-card">
+              <small>Month</small>
+              <strong>{selectedMonth}</strong>
+              <span className="sub">Paid {paidCount} · Unpaid {members.length - paidCount}</span>
+            </div>
+            <div className="summary-card">
+              <small>Collected</small>
+              <strong style={{ color: "var(--success)" }}>₹{collected.toLocaleString()}</strong>
+              <span className="sub">of ₹{totalPerMonth.toLocaleString()}</span>
+            </div>
+            <div className="summary-card">
+              <small>Pending</small>
+              <strong style={{ color: "var(--danger)" }}>₹{pending.toLocaleString()}</strong>
+              <span className="sub">Due this month</span>
+            </div>
+            <div className="summary-card">
+              <small>Receiver</small>
+              <strong>Member {getCurrentReceiverId()}</strong>
+              <span className="sub">₹{getChitAmount(selectedMonth).toLocaleString()}</span>
+            </div>
+          </div>
 
-      {/* ---- MONTH SELECTOR ---- */}
-    <div className="months-bar" style={{ marginBottom: 24, display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "4px" }}>
-        {[...Array(TOTAL_MONTHS)].map((_, i) => {
-          const monthNum = i + 1;
-          const isActive = selectedMonth === monthNum;
-          const isCurrent = monthNum === getCurrentMonth();
-          return (
-            <button
-              key={monthNum}
-              onClick={() => setSelectedMonth(monthNum)}
-              style={{
-                margin: "2px",
-                fontWeight: isActive ? "bold" : "normal",
-                background: isActive ? "#007bff" : isCurrent ? "#e8f4fd" : "#e9ecef",
-                color: isActive ? "white" : isCurrent ? "#007bff" : "#495057",
-                border: isCurrent && !isActive ? "1px solid #007bff" : "none",
-                borderRadius: 4,
-                padding: "4px 12px",
-                cursor: "pointer",
-              }}
-            >
-              {monthNum}
+          <div className="admin-actions">
+            <button className="btn-advance" onClick={advanceMonth}>
+              ▶ Advance to Month {getCurrentMonth() + 1}
             </button>
-          );
-        })}
-      </div>
+            <button className="btn-reset" onClick={resetThisMonth}>
+              ↺ Reset Month {selectedMonth}
+            </button>
+          </div>
+        </div>
 
-      {/* ---- PAYMENTS TABLE ---- */}
-      <div className="table-card">
-        <h3 style={{ marginTop: 0, marginBottom: 20, textAlign: "left" }}>
-          Payment Tracking — Month {selectedMonth}
-        </h3>
+        {/* ---- MONTH SELECTOR ---- */}
+        <div className="months-bar">
+          {[...Array(TOTAL_MONTHS)].map((_, i) => {
+            const monthNum = i + 1;
+            const isActive = selectedMonth === monthNum;
+            const isCurrent = monthNum === getCurrentMonth();
+            let cls = "month-btn";
+            if (isActive) cls += " active";
+            else if (isCurrent) cls += " current";
+            return (
+              <button key={monthNum} className={cls} onClick={() => setSelectedMonth(monthNum)}>
+                {monthNum}
+              </button>
+            );
+          })}
+        </div>
 
-        <table className="members-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Chit Picked</th>
-              <th>Due (M{selectedMonth})</th>
-              <th>Status</th>
-              <th>Short Payment</th>
-              <th>Total Due</th>
-            </tr>
-          </thead>
-          <tbody>
-            {members.map((m) => {
-              const prevMonthDue = selectedMonth > 1 ? getMemberDueAmount(m, selectedMonth - 1) : 0;
-              const rowClass = prevMonthDue > 0 ? "prev-due" : "";
-              const showBadge = prevMonthDue > 0;
-              const isPaid = Boolean(m.payments?.[selectedMonth]?.paid);
-              let statusClass = isPaid ? "paid" : "unpaid";
-              if (m.id === getCurrentReceiverId()) statusClass = "receiver";
-
-              return (
-                <tr key={m.id} className={`${rowClass} ${statusClass}`}>
-                  <td>{m.id}</td>
-                  <td>{m.name}</td>
-                  <td>{m.phone}</td>
-                  <td>
-                    {m.chitMonthPicked ? (
-                      `Month ${m.chitMonthPicked}`
-                    ) : !alreadyPicked ? (
-                      <button
-                        className="action-button"
-                        onClick={() => assignChitMonth(m, selectedMonth)}
-                      >
-                        Pick Now
-                      </button>
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-                  <td>₹{getMemberPaymentAmount(m, selectedMonth).toLocaleString()}</td>
-                  <td>
-                    {(() => {
-                      const paymentObj = m.payments?.[selectedMonth] || {};
-                      const paid = paymentObj.paid || false;
-                      const paidDate = paymentObj.date;
-                      return !paid ? (
-                        <button
-                          className="action-button"
-                          style={{ backgroundColor: "#00cc66" }}
-                          onClick={() => togglePayment(m)}
-                        >
-                          Mark Paid
-                        </button>
-                      ) : (
-                        <>
-                          ✅ Paid
-                          {paidDate && (
-                            <span style={{ marginLeft: 6, color: "#6c757d", fontWeight: "normal", fontSize: "0.85em" }}>
-                              ({new Date(paidDate).toLocaleDateString()})
-                            </span>
-                          )}
-                          {paidDate && (Date.now() - new Date(paidDate).getTime() < 3600000) && (
-                            <button
-                              onClick={() => togglePayment(m)}
-                              style={{
-                                marginLeft: 8, background: "none", border: "1px solid #ccc",
-                                borderRadius: 4, cursor: "pointer", fontSize: "0.75em",
-                                color: "#999", padding: "2px 6px",
-                              }}
-                            >
-                              undo
-                            </button>
-                          )}
-                        </>
-                      );
-                    })()}
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      min="0"
-                      value={m.shortPayments?.[selectedMonth] || 0}
-                      onChange={(e) =>
-                        updateShortPayment(m, selectedMonth, parseFloat(e.target.value) || 0)
-                      }
-                      style={{ width: 80, padding: 5, borderRadius: 4, border: "1px solid #ccc" }}
-                    />
-                  </td>
-                  <td>
-                    <strong style={{ color: showBadge ? "#dc3545" : "#333" }}>
-                      ₹{getMemberDueAmount(m, selectedMonth).toLocaleString()}
-                    </strong>
-                    {showBadge && <span className="due-badge">DUE!</span>}
-                  </td>
+        {/* ---- PAYMENTS TABLE ---- */}
+        <div className="table-card">
+          <div className="table-card-header">
+            <h3>Payment Tracking — Month {selectedMonth}</h3>
+          </div>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Chit Picked</th>
+                  <th>Due</th>
+                  <th>Status</th>
+                  <th>Short Pay</th>
+                  <th>Total Due</th>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+              </thead>
+              <tbody>
+                {members.map((m) => {
+                  const prevMonthDue = selectedMonth > 1 ? getMemberDueAmount(m, selectedMonth - 1) : 0;
+                  const rowClass = prevMonthDue > 0 ? "prev-due" : "";
+                  const showBadge = prevMonthDue > 0;
+                  const isPaid = Boolean(m.payments?.[selectedMonth]?.paid);
+                  let statusClass = isPaid ? "paid" : "unpaid";
+                  if (m.id === getCurrentReceiverId()) statusClass = "receiver";
 
-      <div style={{ marginTop: 20, color: "#6c757d", fontSize: "0.9em" }}>
-        <small>
-          "Total Due" = all unpaid months' amounts + accumulated short payments up to Month {selectedMonth}.
-        </small>
+                  return (
+                    <tr key={m.id} className={`${rowClass} ${statusClass}`}>
+                      <td><strong>{m.id}</strong></td>
+                      <td style={{ textAlign: "left", fontWeight: 500 }}>{m.name}</td>
+                      <td style={{ color: "var(--text-muted)", fontSize: "0.85em" }}>{m.phone}</td>
+                      <td>
+                        {m.chitMonthPicked ? (
+                          <span style={{ fontSize: "0.82em", color: "var(--warning)", fontWeight: 600 }}>
+                            Month {m.chitMonthPicked}
+                          </span>
+                        ) : !alreadyPicked ? (
+                          <button
+                            className="action-button btn-pick-now"
+                            onClick={() => assignChitMonth(m, selectedMonth)}
+                          >
+                            Pick Now
+                          </button>
+                        ) : "—"}
+                      </td>
+                      <td style={{ fontWeight: 600 }}>₹{getMemberPaymentAmount(m, selectedMonth).toLocaleString()}</td>
+                      <td>
+                        {(() => {
+                          const paymentObj = m.payments?.[selectedMonth] || {};
+                          const paid = paymentObj.paid || false;
+                          const paidDate = paymentObj.date;
+                          return !paid ? (
+                            <button className="action-button btn-mark-paid" onClick={() => togglePayment(m)}>
+                              Mark Paid
+                            </button>
+                          ) : (
+                            <span className="status-paid">
+                              ✓ Paid
+                              {paidDate && (
+                                <span className="status-paid-date">
+                                  {new Date(paidDate).toLocaleDateString()}
+                                </span>
+                              )}
+                              {paidDate && (Date.now() - new Date(paidDate).getTime() < 3600000) && (
+                                <button className="btn-undo" onClick={() => togglePayment(m)}>undo</button>
+                              )}
+                            </span>
+                          );
+                        })()}
+                      </td>
+                      <td>
+                        <input
+                          className="short-input"
+                          type="number"
+                          min="0"
+                          value={m.shortPayments?.[selectedMonth] || 0}
+                          onChange={(e) => updateShortPayment(m, selectedMonth, parseFloat(e.target.value) || 0)}
+                        />
+                      </td>
+                      <td>
+                        <strong style={{ color: showBadge ? "var(--danger)" : "var(--text)" }}>
+                          ₹{getMemberDueAmount(m, selectedMonth).toLocaleString()}
+                        </strong>
+                        {showBadge && <span className="due-badge">DUE</span>}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div className="table-note">
+            "Total Due" = all unpaid months + short payments accumulated up to Month {selectedMonth}
+          </div>
+        </div>
+
       </div>
     </div>
   );
