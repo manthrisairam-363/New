@@ -369,7 +369,7 @@ tbody tr:hover td { background: #FAFAFA; }
 }
 .btn-undo:hover { background: var(--bg); }
 
-/* WhatsApp send button */
+/* WhatsApp confirmation button (paid rows) */
 .btn-whatsapp {
   display: inline-flex;
   align-items: center;
@@ -377,12 +377,38 @@ tbody tr:hover td { background: #FAFAFA; }
   margin-left: 6px;
   width: 26px;
   height: 26px;
-  background: #DCFCE7;
+  background: #25D366;
+  color: white;
   border-radius: 50%;
   text-decoration: none;
-  font-size: 14px;
   transition: background 0.15s, transform 0.1s;
   vertical-align: middle;
+  flex-shrink: 0;
+}
+.btn-whatsapp:hover {
+  background: #1DA851;
+  transform: scale(1.1);
+}
+
+/* Bell reminder button (unpaid rows) */
+.btn-reminder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: #FEF9C3;
+  color: #854D0E;
+  border-radius: 50%;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.1s;
+  vertical-align: middle;
+  flex-shrink: 0;
+  border: 1px solid #FDE68A;
+}
+.btn-reminder:hover {
+  background: #FDE68A;
+  transform: scale(1.1);
 }
 .btn-whatsapp:hover {
   background: #BBF7D0;
@@ -461,21 +487,6 @@ tbody tr:hover td { background: #FAFAFA; }
   .summary-card strong { font-size: 1.25em; }
 }
 
-/* WhatsApp send button */
-.btn-whatsapp {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 6px;
-  width: 26px;
-  height: 26px;
-  background: #DCFCE7;
-  border-radius: 50%;
-  text-decoration: none;
-  font-size: 14px;
-  transition: background 0.15s, transform 0.1s;
-  vertical-align: middle;
-}
 .btn-whatsapp:hover {
   background: #BBF7D0;
   transform: scale(1.1);
