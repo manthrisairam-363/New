@@ -362,7 +362,7 @@ export default function Dashboard({ chitId, onBack }) {
         <button className="db-back-btn" onClick={onBack}>
           Back to Overview
         </button>
-        <h2 className="db-title">Chit {chitId} - Dashboard</h2>
+        <h2 className="db-title">Chit {chitId}  -  Dashboard</h2>
         <button
           className={`db-edit-btn ${selectedMonth === 1 ? "prominent" : "subtle"}`}
           onClick={() => setEditingMembers(true)}
@@ -489,12 +489,16 @@ export default function Dashboard({ chitId, onBack }) {
                           const paidDate = paymentObj.date;
 
                           const amount = getMemberPaymentAmount(m, selectedMonth);
+                          const totalDue = getMemberDueAmount(m, selectedMonth);
+                          const prevDue = selectedMonth > 1 ? getMemberDueAmount(m, selectedMonth - 1) : 0;
                           const paidDateStr = paidDate ? new Date(paidDate).toLocaleDateString() : '';
                           const waConfirmMsg = encodeURIComponent(
                             `Hi ${m.name}, your chit payment for Month ${selectedMonth} (Rs.${amount.toLocaleString()}) has been received on ${paidDateStr}. Thank you! - Chitt Tracker`
                           );
                           const waReminderMsg = encodeURIComponent(
-                            `Hi ${m.name}, your chit payment for Month ${selectedMonth} (Rs.${amount.toLocaleString()}) is pending. Kindly pay at the earliest. Thank you! - Chitt Tracker`
+                            prevDue > 0
+                              ? `Hi ${m.name}, your chit payments are pending. Total due: Rs.${totalDue.toLocaleString()} (includes previous unpaid months + Month ${selectedMonth}). Kindly pay at the earliest. Thank you! - Chitt Tracker`
+                              : `Hi ${m.name}, your chit payment for Month ${selectedMonth} (Rs.${amount.toLocaleString()}) is pending. Kindly pay at the earliest. Thank you! - Chitt Tracker`
                           );
                           const waBase = `https://wa.me/91${m.phone}?text=`;
 
@@ -532,7 +536,7 @@ export default function Dashboard({ chitId, onBack }) {
 
                           return (
                             <span className="status-paid">
-                              (ok) Paid
+                              OK Paid
                               {paidDate && (
                                 <span className="status-paid-date">
                                   {new Date(paidDate).toLocaleDateString()}
