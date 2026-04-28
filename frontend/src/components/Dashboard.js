@@ -360,9 +360,9 @@ export default function Dashboard({ chitId, onBack }) {
       {/* ---- STICKY TOP BAR ---- */}
       <div className="db-topbar">
         <button className="db-back-btn" onClick={onBack}>
-          <- Back to Overview
+          Back to Overview
         </button>
-        <h2 className="db-title">Chit {chitId}  -  Dashboard</h2>
+        <h2 className="db-title">Chit {chitId} - Dashboard</h2>
         <button
           className={`db-edit-btn ${selectedMonth === 1 ? "prominent" : "subtle"}`}
           onClick={() => setEditingMembers(true)}
