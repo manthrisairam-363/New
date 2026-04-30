@@ -347,6 +347,16 @@ export default function Dashboard({ chitId, onBack }) {
   const pending = totalPerMonth - collected;
   const alreadyPicked = members.some((m) => m.chitMonthPicked === selectedMonth);
 
+  // Total outstanding across ALL months up to current
+  const totalOutstanding = members.reduce(
+    (sum, m) => sum + getMemberDueAmount(m, selectedMonth), 0
+  );
+
+  // Receiver name instead of just ID
+  const receiverId = getCurrentReceiverId();
+  const receiverMember = members.find((m) => m.id === receiverId);
+  const receiverName = receiverMember?.name || `Member ${receiverId}`;
+
   return (
     <div className="dashboard">
 
@@ -384,16 +394,21 @@ export default function Dashboard({ chitId, onBack }) {
             <div className="summary-card">
               <small>Collected This Month</small>
               <strong style={{ color: "var(--success)" }}>Rs.{collected.toLocaleString()}</strong>
-              <span className="sub">Total Expected: Rs.{totalPerMonth.toLocaleString()}</span>
+              <span className="sub">Expected: Rs.{totalPerMonth.toLocaleString()}</span>
             </div>
             <div className="summary-card pending-card">
-              <small>Pending Collection</small>
+              <small>Pending This Month</small>
               <strong style={{ color: "var(--danger)" }}>Rs.{pending.toLocaleString()}</strong>
-              <span className="sub">Due in current month</span>
+              <span className="sub">Current month only</span>
+            </div>
+            <div className="summary-card" style={{ background: "#FFF1F2", border: "1px solid #FECDD3" }}>
+              <small style={{ color: "#9F1239" }}>Total Outstanding</small>
+              <strong style={{ color: "#BE123C" }}>Rs.{totalOutstanding.toLocaleString()}</strong>
+              <span className="sub">All months combined</span>
             </div>
             <div className="summary-card">
               <small>Current Receiver</small>
-              <strong>Member {getCurrentReceiverId()}</strong>
+              <strong style={{ fontSize: "1.2em" }}>{receiverName}</strong>
               <span className="sub">Chit Value: Rs.{getChitAmount(selectedMonth).toLocaleString()}</span>
             </div>
           </div>
