@@ -2,7 +2,6 @@
 
 .overview-page {
   min-height: 100vh;
-  background: url('/bg.jpg') center center / cover no-repeat fixed;
 }
 
 .chit-overview {
@@ -19,13 +18,13 @@
 .overview-main-title {
   font-size: 1.6em;
   font-weight: 700;
-  color: var(--text);
+  color: #FFFFFF;
   margin: 0 0 6px;
 }
 
 .overview-subtitle {
   font-size: 0.88em;
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.7);
   margin: 0;
 }
 
@@ -36,7 +35,7 @@
 }
 
 .chit-card {
-  background: var(--surface);
+  background: rgba(255, 255, 255, 0.92);
   border-radius: var(--radius-lg);
   border: 1.5px solid var(--border);
   overflow: hidden;
