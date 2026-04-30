@@ -101,7 +101,7 @@
 
 .summary {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
   margin-bottom: 18px;
 }
@@ -453,10 +453,6 @@ tbody tr:hover td { background: #F8FAFF; }
 }
 
 /* Responsive */
-@media (max-width: 1024px) {
-  .summary { grid-template-columns: repeat(3, 1fr); }
-}
-
 @media (max-width: 768px) {
   .summary { grid-template-columns: repeat(2, 1fr); }
   .db-topbar { padding: 0 14px; height: 54px; }
