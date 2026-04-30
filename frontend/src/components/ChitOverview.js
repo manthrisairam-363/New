@@ -50,7 +50,7 @@ const ChitOverview = ({ onSelectChit }) => {
   if (loading) {
     return (
       <div className="overview-page" style={{
-        backgroundImage: `url(${process.env.PUBLIC_URL}/bg.jpg)`,
+        backgroundImage: 'url(' + process.env.PUBLIC_URL + '/bg.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center center',
         backgroundAttachment: 'fixed',
@@ -81,7 +81,7 @@ const ChitOverview = ({ onSelectChit }) => {
 
   return (
     <div className="overview-page" style={{
-        backgroundImage: `url(${process.env.PUBLIC_URL}/bg.jpg)`,
+        backgroundImage: 'url(' + process.env.PUBLIC_URL + '/bg.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center center',
         backgroundAttachment: 'fixed',
