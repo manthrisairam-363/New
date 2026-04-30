@@ -21,11 +21,6 @@ export default function Dashboard({ chitId, onBack }) {
     11500, 11000, 10500, 9500, 9000, 9000, 9000, 19500,
   ];
   const AFTER_AMOUNT = 19500;
-  const CHIT_AMOUNTS = [
-    500000, 500000, 500000, 500000, 500000, 500000, 500000, 500000, 500000, 500000,
-    500000, 500000, 500000, 500000, 500000, 500000, 500000, 500000, 500000, 500000,
-    505000, 510000, 515000, 520000, 525000, 530000, 535000, 540000, 545000, 550000,
-  ];
 
   const [members, setMembers] = useState([]);
   const [config, setConfig] = useState(null);
@@ -120,7 +115,6 @@ export default function Dashboard({ chitId, onBack }) {
 
   const getCurrentMonth = () => config?.currentMonth || 1;
   const getCurrentReceiverId = () => config?.currentReceiver || 1;
-  const getChitAmount = (month) => CHIT_AMOUNTS[month - 1] || CHIT_AMOUNTS[0];
   const countPaidForMonth = (month) =>
     members.filter((m) => m.payments?.[month]?.paid).length;
 
@@ -289,29 +283,6 @@ export default function Dashboard({ chitId, onBack }) {
     }
   };
 
-  const resetThisMonth = async () => {
-    const month = selectedMonth;
-    const confirmed = window.confirm(
-      `Reset ALL payments for Month ${month} to unpaid? This cannot be undone.`
-    );
-    if (!confirmed) return;
-    try {
-      for (const m of members) {
-        const updatedPayments = { ...m.payments, [month]: { paid: false, date: null } };
-        const updatedMember = { ...m, payments: updatedPayments };
-        await setDoc(doc(db, `chit-${chitId}-members`, String(m.id)), updatedMember);
-      }
-      const resetMembers = members.map((m) => ({
-        ...m,
-        payments: { ...m.payments, [month]: { paid: false, date: null } },
-      }));
-      setMembers(resetMembers);
-      updateOverviewSummary(resetMembers, config);
-      showToast(`Month ${month} payments reset to unpaid`);
-    } catch (err) {
-      showToast("Reset failed", "error");
-    }
-  };
 
   if (loading || selectedMonth === null)
     return <div style={{ padding: 20, textAlign: "center" }}>Loading...</div>;
