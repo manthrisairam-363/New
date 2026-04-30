@@ -49,13 +49,7 @@ const ChitOverview = ({ onSelectChit }) => {
 
   if (loading) {
     return (
-      <div className="overview-page" style={{
-        backgroundImage: 'url(' + process.env.PUBLIC_URL + '/bg.jpg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center center',
-        backgroundAttachment: 'fixed',
-        backgroundColor: '#1E1B4B',
-      }}>
+      <div className="overview-page" >
         <div className="chit-overview">
           <div className="overview-page-header">
             <h2 className="overview-main-title">Chit Fund Management Dashboard</h2>
@@ -80,13 +74,7 @@ const ChitOverview = ({ onSelectChit }) => {
   }
 
   return (
-    <div className="overview-page" style={{
-        backgroundImage: 'url(' + process.env.PUBLIC_URL + '/bg.jpg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center center',
-        backgroundAttachment: 'fixed',
-        backgroundColor: '#1E1B4B',
-      }}>
+    <div className="overview-page" >
       <div className="chit-overview">
         <div className="overview-page-header">
           <h2 className="overview-main-title">Chit Fund Management Dashboard</h2>
