@@ -2,7 +2,7 @@
 
 .overview-page {
   min-height: 100vh;
-  background: var(--bg);
+  background: url('/bg.jpg') center center / cover no-repeat fixed;
 }
 
 .chit-overview {
