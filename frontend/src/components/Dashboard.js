@@ -134,30 +134,28 @@ export default function Dashboard({ chitId, onBack }) {
       const isCurrentlyPaid = payments[month]?.paid || false;
 
       if (!isCurrentlyPaid) {
-        // Mark ONLY the selected month as paid
-        payments[month] = { paid: true, date: now };
+        // Mark ALL unpaid months up to selected month as paid on this date
+        // This handles members who settle multiple months at once
+        for (let m = 1; m <= month; m++) {
+          if (!payments[m]?.paid) {
+            payments[m] = { paid: true, date: now };
+          }
+        }
       } else {
-        // Unmark if already paid (toggle off)
+        // Undo: only unmark the selected month, leave other months intact
         payments[month] = { paid: false, date: null };
       }
 
-      // If there's a short payment from previous month, clear it when marking paid
-      let updatedShortPayments = { ...member.shortPayments };
-      if (!isCurrentlyPaid && month > 1 && updatedShortPayments[month - 1]) {
-        updatedShortPayments[month - 1] = 0;
-      }
-
-      const updatedMember = { ...member, payments, shortPayments: updatedShortPayments };
+      const updatedMember = { ...member, payments };
       await setDoc(doc(db, `chit-${chitId}-members`, String(member.id)), updatedMember);
       const newMembers = members.map((p) => (p.id === member.id ? updatedMember : p));
       setMembers(newMembers);
-      // Keep overview summary in sync
       updateOverviewSummary(newMembers, config);
 
       showToast(
         isCurrentlyPaid
-          ? `${member.name}  -  Month ${month} marked unpaid`
-          : `(ok) ${member.name}  -  Month ${month} marked paid`
+          ? `${member.name} - Month ${month} marked unpaid`
+          : `${member.name} - all dues cleared up to Month ${month}`
       );
     } catch (err) {
       console.error("togglePayment error:", err);
@@ -378,7 +376,7 @@ export default function Dashboard({ chitId, onBack }) {
               <strong>Month {selectedMonth}</strong>
               <span className="sub">Paid: {paidCount} / Unpaid: {members.length - paidCount}</span>
               {receiverDisplay && (
-                <span className="sub" style={{ marginTop: 4, display: "block", color: "#4F46E5", fontWeight: 600 }}>
+                <span className="sub" style={{ marginTop: 4, display: "block", color: "#4F46E5", fontWeight: 700, fontSize: "1em" }}>
                   Receiver: {receiverDisplay}
                 </span>
               )}
