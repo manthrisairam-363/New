@@ -232,7 +232,11 @@ export default function Dashboard({ chitId, onBack }) {
       return;
     }
     try {
-      const updatedMember = { ...member, chitMonthPicked: month };
+      const updatedMember = {
+        ...member,
+        chitMonthPicked: month,
+        chitPickDate: new Date().toISOString(),
+      };
       await setDoc(doc(db, `chit-${chitId}-members`, String(member.id)), updatedMember);
       setMembers((prev) =>
         prev.map((p) => (p.id === member.id ? updatedMember : p))
@@ -240,6 +244,19 @@ export default function Dashboard({ chitId, onBack }) {
       showToast(`${member.name} picked chit for Month ${month} (ok)`);
     } catch (err) {
       console.error("assignChitMonth error:", err);
+    }
+  };
+
+  const unassignChitMonth = async (member) => {
+    try {
+      const updatedMember = { ...member, chitMonthPicked: null, chitPickDate: null };
+      await setDoc(doc(db, `chit-${chitId}-members`, String(member.id)), updatedMember);
+      setMembers((prev) =>
+        prev.map((p) => (p.id === member.id ? updatedMember : p))
+      );
+      showToast(`${member.name} pick undone`);
+    } catch (err) {
+      console.error("unassignChitMonth error:", err);
     }
   };
 
@@ -352,10 +369,9 @@ export default function Dashboard({ chitId, onBack }) {
     (sum, m) => sum + getMemberDueAmount(m, selectedMonth), 0
   );
 
-  // Receiver name instead of just ID
-  const receiverId = getCurrentReceiverId();
-  const receiverMember = members.find((m) => m.id === receiverId);
-  const receiverName = receiverMember?.name || `Member ${receiverId}`;
+  // Receiver: only show name if someone actually picked this month
+  const pickedThisMonth = members.find((m) => m.chitMonthPicked === selectedMonth);
+  const receiverDisplay = pickedThisMonth ? pickedThisMonth.name : null;
 
   return (
     <div className="dashboard">
@@ -372,7 +388,7 @@ export default function Dashboard({ chitId, onBack }) {
         <button className="db-back-btn" onClick={onBack}>
           Back to Overview
         </button>
-        <h2 className="db-title">Chit {chitId}  -  Dashboard</h2>
+        <h2 className="db-title">Chit {chitId} - Dashboard</h2>
         <button
           className={`db-edit-btn ${selectedMonth === 1 ? "prominent" : "subtle"}`}
           onClick={() => setEditingMembers(true)}
@@ -383,13 +399,18 @@ export default function Dashboard({ chitId, onBack }) {
 
       <div className="db-body">
 
-        {/* ---- SUMMARY CARDS ---- */}
+        {/* ---- SUMMARY CARDS (4 cards) ---- */}
         <div className="summary-container">
           <div className="summary">
             <div className="summary-card">
               <small>Month Status</small>
               <strong>Month {selectedMonth}</strong>
               <span className="sub">Paid: {paidCount} / Unpaid: {members.length - paidCount}</span>
+              {receiverDisplay && (
+                <span className="sub" style={{ marginTop: 4, display: "block", color: "#4F46E5", fontWeight: 600 }}>
+                  Receiver: {receiverDisplay}
+                </span>
+              )}
             </div>
             <div className="summary-card">
               <small>Collected This Month</small>
@@ -406,19 +427,11 @@ export default function Dashboard({ chitId, onBack }) {
               <strong style={{ color: "#BE123C" }}>Rs.{totalOutstanding.toLocaleString()}</strong>
               <span className="sub">All months combined</span>
             </div>
-            <div className="summary-card">
-              <small>Current Receiver</small>
-              <strong style={{ fontSize: "1.2em" }}>{receiverName}</strong>
-              <span className="sub">Chit Value: Rs.{getChitAmount(selectedMonth).toLocaleString()}</span>
-            </div>
           </div>
 
           <div className="admin-actions">
             <button className="btn-advance" onClick={advanceMonth}>
-              > Advance to Month {getCurrentMonth() + 1}
-            </button>
-            <button className="btn-reset" onClick={resetThisMonth}>
-              Reset Reset Month {selectedMonth} Payments
+              Advance to Month {getCurrentMonth() + 1}
             </button>
           </div>
         </div>
@@ -484,8 +497,19 @@ export default function Dashboard({ chitId, onBack }) {
                       </td>
                       <td>
                         {m.chitMonthPicked ? (
-                          <span style={{ fontSize: "0.85em", color: "var(--warning)", fontWeight: 600 }}>
-                            Month {m.chitMonthPicked}
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                            <span style={{ fontSize: "0.85em", color: "#D97706", fontWeight: 600 }}>
+                              Month {m.chitMonthPicked}
+                            </span>
+                            {m.chitPickDate && (Date.now() - new Date(m.chitPickDate).getTime() < 7 * 24 * 3600000) && (
+                              <button
+                                className="btn-undo"
+                                onClick={() => unassignChitMonth(m)}
+                                title="Undo pick (available for 7 days)"
+                              >
+                                undo
+                              </button>
+                            )}
                           </span>
                         ) : !alreadyPicked ? (
                           <button
