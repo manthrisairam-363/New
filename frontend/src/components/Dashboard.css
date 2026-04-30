@@ -290,7 +290,7 @@ td {
   border-bottom: 1px solid #F1F5F9;
   vertical-align: middle;
   color: #374151;
-  font-size: 0.92em;
+  font-size: 0.95em;
 }
 
 tbody tr:last-child td { border-bottom: none; }
