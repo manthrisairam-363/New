@@ -367,7 +367,7 @@ export default function Dashboard({ chitId, onBack }) {
           className={`db-edit-btn ${selectedMonth === 1 ? "prominent" : "subtle"}`}
           onClick={() => setEditingMembers(true)}
         >
-          Edit {selectedMonth === 1 ? "Set Up / Edit Members" : "Edit Members"}
+          {selectedMonth === 1 ? "Set Up / Edit Members" : "Edit Members"}
         </button>
       </div>
 
