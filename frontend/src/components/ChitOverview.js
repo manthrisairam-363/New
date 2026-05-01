@@ -6,7 +6,7 @@ import "./ChitOverview.css";
 import AddChitModal from "./AddChitModal";
 
 // Fallback hardcoded IDs for existing chits (migrated to Firestore on first load)
-const LEGACY_IDS = ["2025", "2026", "1992", "2434", "1809", "1116"];
+const LEGACY_IDS = ["2025", "2026", "1992", "2434", "1116"];
 
 const ChitOverview = ({ onSelectChit }) => {
   const [chits, setChits] = useState([]);
