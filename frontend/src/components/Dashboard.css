@@ -147,30 +147,6 @@
   border-color: #FED7AA !important;
 }
 
-/* ---- Admin Actions ---- */
-.admin-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  padding-top: 16px;
-  border-top: 1px solid #F1F5F9;
-  justify-content: center;
-}
-
-.btn-advance {
-  background: #FEF3C7;
-  color: #92400E;
-  border: 1px solid #FDE68A;
-  padding: 9px 20px;
-  border-radius: 8px;
-  font-size: 0.85em;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.15s;
-  font-family: inherit;
-}
-.btn-advance:hover { background: #FDE68A; }
-
 .btn-reset {
   background: #FEE2E2;
   color: #991B1B;
