@@ -261,34 +261,6 @@ export default function Dashboard({ chitId, onBack }) {
     }
   };
 
-  const advanceMonth = async () => {
-    if (!config) return;
-    const currMonth = getCurrentMonth();
-    if (currMonth >= TOTAL_MONTHS) {
-      showToast(`All ${TOTAL_MONTHS} months completed.`, "error");
-      return;
-    }
-    const confirmed = window.confirm(
-      `Advance to Month ${currMonth + 1}? Make sure all Month ${currMonth} payments are recorded.`
-    );
-    if (!confirmed) return;
-    try {
-      const nextMonth = currMonth + 1;
-      const nextReceiver =
-        getCurrentReceiverId() >= members.length ? 1 : getCurrentReceiverId() + 1;
-      await updateDoc(configDocRef, {
-        currentMonth: nextMonth,
-        currentReceiver: nextReceiver,
-      });
-      const newConfig = { ...config, currentMonth: nextMonth, currentReceiver: nextReceiver };
-      setConfig(newConfig);
-      setSelectedMonth(nextMonth);
-      updateOverviewSummary(members, newConfig);
-      showToast(`Advanced to Month ${nextMonth} (ok)`);
-    } catch (err) {
-      showToast("Failed to advance month", "error");
-    }
-  };
 
 
   if (loading || selectedMonth === null)
@@ -407,11 +379,6 @@ export default function Dashboard({ chitId, onBack }) {
             </div>
           </div>
 
-          <div className="admin-actions">
-            <button className="btn-advance" onClick={advanceMonth}>
-              Advance to Month {getCurrentMonth() + 1}
-            </button>
-          </div>
         </div>
 
         {/* ---- MONTH SELECTOR ---- */}
