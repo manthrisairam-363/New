@@ -88,6 +88,15 @@ export default function Dashboard({ chitId, onBack }) {
           await setDoc(configDocRef, cdata);
         } else {
           cdata = cSnap.data();
+
+          // Auto-calculate current month from start date if available
+          if (cdata.startMonth && cdata.startYear) {
+            const today = new Date();
+            const diff = (today.getFullYear() - cdata.startYear) * 12
+              + (today.getMonth() + 1 - cdata.startMonth) + 1;
+            cdata.currentMonth = Math.min(Math.max(1, diff), TOTAL_MONTHS);
+          }
+
           if (!cdata.currentMonth || cdata.currentMonth < 1 || cdata.currentMonth > TOTAL_MONTHS) {
             cdata.currentMonth = 1;
           }
