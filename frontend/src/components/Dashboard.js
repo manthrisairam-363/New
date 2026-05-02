@@ -173,16 +173,22 @@ export default function Dashboard({ chitId, onBack }) {
       const isCurrentlyPaid = payments[month]?.paid || false;
 
       if (!isCurrentlyPaid) {
-        // Mark ALL unpaid months up to selected month as paid on this date
-        // This handles members who settle multiple months at once
+        // Mark ALL unpaid months up to selected month as paid
+        // date = actual payment date for that month (for WhatsApp message)
+        // markedAt = when user clicked Mark Paid (for undo 1-hour window)
+        const markedAt = new Date().toISOString();
         for (let m = 1; m <= month; m++) {
           if (!payments[m]?.paid) {
-            payments[m] = { paid: true, date: getPaymentDateForMonth(m) };
+            payments[m] = {
+              paid: true,
+              date: getPaymentDateForMonth(m),
+              markedAt,
+            };
           }
         }
       } else {
-        // Undo: only unmark the selected month, leave other months intact
-        payments[month] = { paid: false, date: null };
+        // Undo: only unmark the selected month
+        payments[month] = { paid: false, date: null, markedAt: null };
       }
 
       const updatedMember = { ...member, payments };
@@ -565,7 +571,7 @@ export default function Dashboard({ chitId, onBack }) {
                               >
                                 <WhatsAppIcon />
                               </a>
-                              {paidDate && (Date.now() - new Date(paidDate).getTime() < 3600000) && (
+                              {paymentObj.markedAt && (Date.now() - new Date(paymentObj.markedAt).getTime() < 3600000) && (
                                 <button className="btn-undo" onClick={() => togglePayment(m)}>undo</button>
                               )}
                             </span>
