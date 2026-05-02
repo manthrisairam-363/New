@@ -26,6 +26,8 @@ export default function Dashboard({ chitId, onBack }) {
   const [config, setConfig] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editingMembers, setEditingMembers] = useState(false);
+  const [settingStartDate, setSettingStartDate] = useState(false);
+  const [startDateInput, setStartDateInput] = useState({ month: new Date().getMonth() + 1, year: new Date().getFullYear() });
   const [selectedMonth, setSelectedMonth] = useState(null);
 
   // ---- TOAST ----
@@ -249,6 +251,23 @@ export default function Dashboard({ chitId, onBack }) {
     }
   };
 
+  const saveStartDate = async () => {
+    try {
+      const sm = startDateInput.month;
+      const sy = startDateInput.year;
+      const today = new Date();
+      const diff = (today.getFullYear() - sy) * 12 + (today.getMonth() + 1 - sm) + 1;
+      const currentMonth = Math.min(Math.max(1, diff), TOTAL_MONTHS);
+      await updateDoc(configDocRef, { startMonth: sm, startYear: sy, currentMonth });
+      setConfig(prev => ({ ...prev, startMonth: sm, startYear: sy, currentMonth }));
+      setSelectedMonth(currentMonth);
+      setSettingStartDate(false);
+      showToast("Start date saved! Month names updated.");
+    } catch (err) {
+      showToast("Failed to save start date", "error");
+    }
+  };
+
   const updateShortPayment = async (member, month, amount) => {
     try {
       const updatedShortPayments = { ...member.shortPayments, [month]: amount };
@@ -369,7 +388,7 @@ export default function Dashboard({ chitId, onBack }) {
         </div>
       )}
 
-      {/* ---- STICKY TOP BAR ---- */}}
+      {/* ---- STICKY TOP BAR ---- */}
       <div className="db-topbar">
         <button className="db-back-btn" onClick={onBack}>
           Back to Overview
@@ -384,6 +403,76 @@ export default function Dashboard({ chitId, onBack }) {
       </div>
 
       <div className="db-body">
+
+        {/* ---- SET START DATE PROMPT ---- */}
+        {!config?.startMonth && !settingStartDate && (
+          <div style={{
+            background: "#EEF2FF", border: "1px solid #C7D2FE", borderRadius: 12,
+            padding: "14px 18px", marginBottom: 16, display: "flex",
+            alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10
+          }}>
+            <div>
+              <div style={{ fontWeight: 700, color: "#1E1B4B", fontSize: "0.9em" }}>
+                Set a start date for this chit
+              </div>
+              <div style={{ color: "#6366F1", fontSize: "0.78em", marginTop: 2 }}>
+                This enables month names (Jan 2026, Feb 2026...) instead of numbers
+              </div>
+            </div>
+            <button
+              onClick={() => setSettingStartDate(true)}
+              style={{
+                background: "#4F46E5", color: "white", border: "none",
+                padding: "8px 16px", borderRadius: 8, fontWeight: 600,
+                fontSize: "0.85em", cursor: "pointer", fontFamily: "inherit"
+              }}
+            >
+              Set Start Date
+            </button>
+          </div>
+        )}
+
+        {/* ---- START DATE FORM ---- */}
+        {settingStartDate && (
+          <div style={{
+            background: "white", border: "1px solid #E2E8F0", borderRadius: 12,
+            padding: "20px", marginBottom: 16, boxShadow: "0 2px 12px rgba(0,0,0,0.06)"
+          }}>
+            <div style={{ fontWeight: 700, color: "#1E1B4B", marginBottom: 12 }}>
+              When did this chit start?
+            </div>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+              <select
+                value={startDateInput.month}
+                onChange={e => setStartDateInput(p => ({ ...p, month: Number(e.target.value) }))}
+                style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #E2E8F0", fontSize: "0.9em", fontFamily: "inherit" }}
+              >
+                {["January","February","March","April","May","June","July","August","September","October","November","December"].map((m,i) => (
+                  <option key={i} value={i+1}>{m}</option>
+                ))}
+              </select>
+              <select
+                value={startDateInput.year}
+                onChange={e => setStartDateInput(p => ({ ...p, year: Number(e.target.value) }))}
+                style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #E2E8F0", fontSize: "0.9em", fontFamily: "inherit" }}
+              >
+                {Array.from({length:10},(_,i)=>new Date().getFullYear()-5+i).map(y=>(
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
+              <button onClick={saveStartDate} style={{
+                background: "#4F46E5", color: "white", border: "none",
+                padding: "8px 20px", borderRadius: 8, fontWeight: 700,
+                fontSize: "0.9em", cursor: "pointer", fontFamily: "inherit"
+              }}>Save</button>
+              <button onClick={() => setSettingStartDate(false)} style={{
+                background: "#F1F5F9", color: "#64748B", border: "1px solid #E2E8F0",
+                padding: "8px 16px", borderRadius: 8, fontSize: "0.9em",
+                cursor: "pointer", fontFamily: "inherit"
+              }}>Cancel</button>
+            </div>
+          </div>
+        )}
 
         {/* ---- SUMMARY CARDS (4 cards) ---- */}
         <div className="summary-container">
