@@ -178,13 +178,15 @@ export default function Dashboard({ chitId, onBack }) {
         // Mark ALL unpaid months up to selected month as paid
         // date = actual payment date for that month (for WhatsApp message)
         // markedAt = when user clicked Mark Paid (for undo 1-hour window)
-        const markedAt = new Date().toISOString();
+        // Use today as payment date for ALL months being paid now
+        // They came in today and paid everything - today is the correct date
+        const todayISO = new Date().toISOString();
         for (let m = 1; m <= month; m++) {
           if (!payments[m]?.paid) {
             payments[m] = {
               paid: true,
-              date: getPaymentDateForMonth(m),
-              markedAt,
+              date: todayISO,   // when they actually paid
+              markedAt: todayISO, // same - for undo window
             };
           }
         }
@@ -357,16 +359,28 @@ export default function Dashboard({ chitId, onBack }) {
   const totalPerMonth = members.reduce(
     (sum, m) => sum + getMemberPaymentAmount(m, selectedMonth), 0
   );
+  // Collected = total cash actually received when a member marked paid in this month
+  // This includes back dues from previous months they settled
   const collected = members.reduce((sum, m) => {
     const paid = m.payments?.[selectedMonth]?.paid || false;
-    if (paid) {
-      const expected = getMemberPaymentAmount(m, selectedMonth);
-      const short = m.shortPayments?.[selectedMonth] || 0;
-      return sum + Math.max(0, expected - short);
+    if (!paid) return sum;
+    // Count all months this member paid (including back dues settled this month)
+    let memberPaid = 0;
+    for (let mo = 1; mo <= selectedMonth; mo++) {
+      if (m.payments?.[mo]?.paid) {
+        const exp = getMemberPaymentAmount(m, mo);
+        const short = m.shortPayments?.[mo] || 0;
+        memberPaid += Math.max(0, exp - short);
+      }
     }
-    return sum;
+    return sum + memberPaid;
   }, 0);
-  const pending = totalPerMonth - collected;
+  // Pending = what's still owed by unpaid members this month
+  const pending = members.reduce((sum, m) => {
+    const paid = m.payments?.[selectedMonth]?.paid || false;
+    if (paid) return sum;
+    return sum + getMemberDueAmount(m, selectedMonth);
+  }, 0);
   const alreadyPicked = members.some((m) => m.chitMonthPicked === selectedMonth);
 
   // Total outstanding across ALL months up to current
@@ -601,8 +615,18 @@ export default function Dashboard({ chitId, onBack }) {
                           const totalDue = getMemberDueAmount(m, selectedMonth);
                           const prevDue = selectedMonth > 1 ? getMemberDueAmount(m, selectedMonth - 1) : 0;
                           const paidDateStr = paidDate ? new Date(paidDate).toLocaleDateString() : '';
+                          // Calculate total amount they paid today (including back dues)
+                          let totalPaidByMember = 0;
+                          for (let mo = 1; mo <= selectedMonth; mo++) {
+                            if (m.payments?.[mo]?.paid) {
+                              totalPaidByMember += getMemberPaymentAmount(m, mo);
+                            }
+                          }
+                          const hadBackDues = prevDue > 0;
                           const waConfirmMsg = encodeURIComponent(
-                            `Hi ${m.name}, your chit payment for Month ${selectedMonth} (Rs.${amount.toLocaleString()}) has been received on ${paidDateStr}. Thank you! - Chitt Tracker`
+                            hadBackDues
+                              ? `Hi ${m.name}, we have received Rs.${totalPaidByMember.toLocaleString()} on ${paidDateStr}. All your pending dues up to ${getMonthLabel(selectedMonth)} have been cleared. Thank you! - Chitt Tracker`
+                              : `Hi ${m.name}, your chit payment for ${getMonthLabel(selectedMonth)} (Rs.${amount.toLocaleString()}) has been received on ${paidDateStr}. Thank you! - Chitt Tracker`
                           );
                           const waReminderMsg = encodeURIComponent(
                             prevDue > 0
