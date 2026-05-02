@@ -170,26 +170,27 @@
   margin-bottom: 20px;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 12px rgba(0,0,0,0.04);
 }
 
 .month-btn {
-  min-width: 52px;
-  height: 36px;
-  padding: 0 8px;
+  min-width: 58px;
+  height: 34px;
+  padding: 0 10px;
   border-radius: 8px;
   border: 1px solid #E2E8F0;
   background: #F8FAFF;
   color: #64748B;
-  font-size: 0.78em;
+  font-size: 0.76em;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.12s;
   font-family: inherit;
   white-space: nowrap;
+  letter-spacing: -0.2px;
 }
 .month-btn:hover {
   background: #EEF2FF;
