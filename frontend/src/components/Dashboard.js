@@ -169,7 +169,6 @@ export default function Dashboard({ chitId, onBack }) {
   const togglePayment = async (member) => {
     try {
       const month = selectedMonth;
-      const now = new Date().toISOString();
       const payments = { ...member.payments };
       const isCurrentlyPaid = payments[month]?.paid || false;
 
