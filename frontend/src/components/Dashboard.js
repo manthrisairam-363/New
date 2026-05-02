@@ -124,6 +124,37 @@ export default function Dashboard({ chitId, onBack }) {
 
   const getCurrentMonth = () => config?.currentMonth || 1;
   const getCurrentReceiverId = () => config?.currentReceiver || 1;
+
+  // Convert month number to calendar month name + year
+  const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const getMonthLabel = (monthNum) => {
+    if (!config?.startMonth || !config?.startYear) return `Month ${monthNum}`;
+    const totalMonths = config.startMonth - 1 + monthNum - 1;
+    const year = config.startYear + Math.floor(totalMonths / 12);
+    const month = totalMonths % 12;
+    return `${MONTH_NAMES[month]} ${year}`;
+  };
+
+  const getMonthShort = (monthNum) => {
+    if (!config?.startMonth || !config?.startYear) return String(monthNum);
+    const totalMonths = config.startMonth - 1 + monthNum - 1;
+    const year = config.startYear + Math.floor(totalMonths / 12);
+    const month = totalMonths % 12;
+    return `${MONTH_NAMES[month]}'${String(year).slice(2)}`;
+  };
+
+  // Get correct payment date for a past month
+  const getPaymentDateForMonth = (monthNum) => {
+    if (!config?.startMonth || !config?.startYear) return new Date().toISOString();
+    const totalMonths = config.startMonth - 1 + monthNum - 1;
+    const year = config.startYear + Math.floor(totalMonths / 12);
+    const month = totalMonths % 12;
+    // Use last day of that month
+    const lastDay = new Date(year, month + 1, 0);
+    const today = new Date();
+    // If the month is in the future, use today; otherwise use last day of that month
+    return lastDay > today ? today.toISOString() : lastDay.toISOString();
+  };
   const countPaidForMonth = (month) =>
     members.filter((m) => m.payments?.[month]?.paid).length;
 
@@ -147,7 +178,7 @@ export default function Dashboard({ chitId, onBack }) {
         // This handles members who settle multiple months at once
         for (let m = 1; m <= month; m++) {
           if (!payments[m]?.paid) {
-            payments[m] = { paid: true, date: now };
+            payments[m] = { paid: true, date: getPaymentDateForMonth(m) };
           }
         }
       } else {
@@ -333,7 +364,7 @@ export default function Dashboard({ chitId, onBack }) {
         </div>
       )}
 
-      {/* ---- STICKY TOP BAR ---- */}
+      {/* ---- STICKY TOP BAR ---- */}}
       <div className="db-topbar">
         <button className="db-back-btn" onClick={onBack}>
           Back to Overview
@@ -354,7 +385,7 @@ export default function Dashboard({ chitId, onBack }) {
           <div className="summary">
             <div className="summary-card">
               <small>Month Status</small>
-              <strong>Month {selectedMonth}</strong>
+              <strong style={{ fontSize: "1.3em" }}>{getMonthLabel(selectedMonth)}</strong>
               <span className="sub">Paid: {paidCount} / Unpaid: {members.length - paidCount}</span>
               {receiverDisplay && (
                 <span className="sub" style={{ marginTop: 4, display: "block", color: "#4F46E5", fontWeight: 700, fontSize: "1em" }}>
@@ -391,8 +422,8 @@ export default function Dashboard({ chitId, onBack }) {
             if (isActive) cls += " active";
             else if (isCurrent) cls += " current";
             return (
-              <button key={monthNum} className={cls} onClick={() => setSelectedMonth(monthNum)}>
-                {monthNum}
+              <button key={monthNum} className={cls} onClick={() => setSelectedMonth(monthNum)} title={getMonthLabel(monthNum)}>
+                {getMonthShort(monthNum)}
               </button>
             );
           })}
@@ -401,7 +432,7 @@ export default function Dashboard({ chitId, onBack }) {
         {/* ---- PAYMENTS TABLE ---- */}
         <div className="table-card">
           <div className="table-card-header">
-            <h3>Payment Tracking  -  Month {selectedMonth}</h3>
+            <h3>Payment Tracking - {getMonthLabel(selectedMonth)}</h3>
           </div>
           <div className="table-wrap">
             <table>
@@ -411,7 +442,7 @@ export default function Dashboard({ chitId, onBack }) {
                   <th>Name</th>
                   <th>Phone</th>
                   <th>Chit Picked</th>
-                  <th>Due (M{selectedMonth})</th>
+                  <th>Due</th>
                   <th>Status</th>
                   <th>Short Payment</th>
                   <th>Total Due</th>
