@@ -403,6 +403,13 @@ export default function Dashboard({ chitId, onBack }) {
         >
           {selectedMonth === 1 ? "Set Up / Edit Members" : "Edit Members"}
         </button>
+        <button
+          className="db-logout-btn"
+          onClick={onLogout}
+          title={"Signed in as " + (user?.email || "")}
+        >
+          Sign Out
+        </button>
       </div>
 
       <div className="db-body">
