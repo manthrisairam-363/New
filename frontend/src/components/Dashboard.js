@@ -29,6 +29,7 @@ export default function Dashboard({ chitId, onBack, user, onLogout }) {
   const [editingMembers, setEditingMembers] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
   const [reportHtml, setReportHtml] = useState(null);
+  const [remindModal, setRemindModal] = useState(false);
   const [settingStartDate, setSettingStartDate] = useState(false);
   const [startDateInput, setStartDateInput] = useState({ month: new Date().getMonth() + 1, year: new Date().getFullYear() });
   const [selectedMonth, setSelectedMonth] = useState(null);
@@ -403,20 +404,7 @@ export default function Dashboard({ chitId, onBack, user, onLogout }) {
       showToast("All members have paid this month!", "success");
       return;
     }
-    // Open WhatsApp for each unpaid member one by one
-    unpaidMembers.forEach((m, idx) => {
-      const amount = getMemberPaymentAmount(m, selectedMonth);
-      const totalDue = getMemberDueAmount(m, selectedMonth);
-      const prevDue = selectedMonth > 1 ? getMemberDueAmount(m, selectedMonth - 1) : 0;
-      const msg = encodeURIComponent(
-        prevDue > 0
-          ? `Hi ${m.name}, your chit payments are pending. Total due: Rs.${totalDue.toLocaleString()} (includes previous unpaid months + ${getMonthLabel(selectedMonth)}). Kindly pay at the earliest. Thank you! - Chitt Tracker`
-          : `Hi ${m.name}, your chit payment for ${getMonthLabel(selectedMonth)} (Rs.${amount.toLocaleString()}) is pending. Kindly pay at the earliest. Thank you! - Chitt Tracker`
-      );
-      const url = `https://wa.me/91${m.phone}?text=${msg}`;
-      setTimeout(() => window.open(url, "_blank"), idx * 800);
-    });
-    showToast(`Sending reminders to ${unpaidMembers.length} members...`);
+    setRemindModal(true);
   };
 
   const updateShortPayment = async (member, month, amount) => {
@@ -613,7 +601,91 @@ export default function Dashboard({ chitId, onBack, user, onLogout }) {
         </div>
       )}
 
-      {/* ---- STICKY TOP BAR ---- */}
+      {/* ---- REMIND ALL MODAL ---- */}
+      {remindModal && (() => {
+        const unpaid = members.filter(m => !(m.payments?.[selectedMonth]?.paid) && m.phone);
+        return (
+          <div style={{
+            position: "fixed", inset: 0, zIndex: 600,
+            background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)",
+            display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
+          }}>
+            <div style={{
+              background: "#fff", borderRadius: 16, width: "100%", maxWidth: 420,
+              maxHeight: "80vh", display: "flex", flexDirection: "column",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.25)", overflow: "hidden",
+            }}>
+              <div style={{
+                background: "linear-gradient(135deg, #1E1B4B, #312E81)",
+                padding: "16px 20px", display: "flex", justifyContent: "space-between", alignItems: "center",
+              }}>
+                <div>
+                  <div style={{ color: "#fff", fontWeight: 700, fontSize: "0.95em" }}>
+                    Send Reminders
+                  </div>
+                  <div style={{ color: "rgba(196,181,253,0.7)", fontSize: "0.75em", marginTop: 2 }}>
+                    {unpaid.length} unpaid members - {getMonthLabel(selectedMonth)}
+                  </div>
+                </div>
+                <button onClick={() => setRemindModal(false)} style={{
+                  background: "rgba(255,255,255,0.12)", border: "none", color: "#C7D2FE",
+                  width: 30, height: 30, borderRadius: 6, cursor: "pointer", fontFamily: "inherit", fontSize: 14,
+                }}>x</button>
+              </div>
+              <div style={{ overflowY: "auto", flex: 1 }}>
+                {unpaid.map((m, idx) => {
+                  const amount = getMemberPaymentAmount(m, selectedMonth);
+                  const totalDue = getMemberDueAmount(m, selectedMonth);
+                  const prevDue = selectedMonth > 1 ? getMemberDueAmount(m, selectedMonth - 1) : 0;
+                  const msg = encodeURIComponent(
+                    prevDue > 0
+                      ? `Hi ${m.name}, your chit payments are pending. Total due: Rs.${totalDue.toLocaleString()} (includes previous unpaid months + ${getMonthLabel(selectedMonth)}). Kindly pay at the earliest. Thank you! - Chitt Tracker`
+                      : `Hi ${m.name}, your chit payment for ${getMonthLabel(selectedMonth)} (Rs.${amount.toLocaleString()}) is pending. Kindly pay at the earliest. Thank you! - Chitt Tracker`
+                  );
+                  const waUrl = `https://wa.me/91${m.phone}?text=${msg}`;
+                  return (
+                    <div key={m.id} style={{
+                      display: "flex", justifyContent: "space-between", alignItems: "center",
+                      padding: "12px 18px", borderBottom: "1px solid #F1F5F9",
+                    }}>
+                      <div>
+                        <div style={{ fontWeight: 600, color: "#1E293B", fontSize: "0.9em" }}>{m.name}</div>
+                        <div style={{ color: "#DC2626", fontSize: "0.78em", fontWeight: 600, marginTop: 2 }}>
+                          Due: Rs.{totalDue.toLocaleString()}
+                        </div>
+                      </div>
+                      <a
+                        href={waUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          background: "#25D366", color: "white", textDecoration: "none",
+                          padding: "7px 14px", borderRadius: 8, fontSize: "0.82em",
+                          fontWeight: 700, display: "flex", alignItems: "center", gap: 6,
+                        }}
+                      >
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="white">
+                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.855L.057 23.998l6.304-1.453A11.956 11.956 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.651-.502-5.179-1.381l-.371-.22-3.742.862.892-3.648-.242-.378A9.956 9.956 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+                        </svg>
+                        Send
+                      </a>
+                    </div>
+                  );
+                })}
+              </div>
+              <div style={{ padding: "12px 18px", borderTop: "1px solid #F1F5F9", textAlign: "center" }}>
+                <button onClick={() => setRemindModal(false)} style={{
+                  background: "#F1F5F9", border: "1px solid #E2E8F0", color: "#64748B",
+                  padding: "8px 24px", borderRadius: 8, fontSize: "0.88em",
+                  fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                }}>Done</button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* ---- STICKY TOP BAR ---- */}}
       <div className="db-topbar">
         <button className="db-back-btn" onClick={onBack}>
           Back to Overview
