@@ -331,7 +331,19 @@ export default function Dashboard({ chitId, onBack, user, onLogout }) {
     th { padding: 9px 10px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #C7D2FE; }
     td { padding: 9px 10px; font-size: 12px; border-bottom: 1px solid #f1f5f9; }
     .footer { text-align: center; font-size: 10px; color: #9ca3af; margin-top: 20px; padding-top: 12px; border-top: 1px solid #e2e8f0; }
-    @media print { body { padding: 16px; } .no-print { display: none; } }
+    @media print { body { padding: 16px; } }
+    @media (max-width: 600px) {
+      body { padding: 12px; font-size: 11px; }
+      .header { flex-direction: column; gap: 10px; }
+      .report-meta { text-align: left; }
+      .summary { flex-wrap: wrap; }
+      .summary-box { flex: 1 1 45%; }
+      .logo { font-size: 20px; }
+      th { padding: 7px 6px; font-size: 9px; }
+      td { padding: 7px 6px; font-size: 11px; }
+      th:nth-child(3), td:nth-child(3),
+      th:nth-child(9), td:nth-child(9) { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -362,10 +374,6 @@ export default function Dashboard({ chitId, onBack, user, onLogout }) {
       <div class="lbl">Total Expected</div>
     </div>
   </div>
-
-  <button class="no-print" onclick="window.print()" style="margin-bottom:16px;background:#1E1B4B;color:white;border:none;padding:8px 20px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">
-    Print / Save as PDF
-  </button>
 
   <table>
     <thead>
