@@ -11,6 +11,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import MemberSetup from "./MemberSetup";
+import MemberHistory from "./MemberHistory";
 
 export default function Dashboard({ chitId, onBack, user, onLogout }) {
 
@@ -26,6 +27,7 @@ export default function Dashboard({ chitId, onBack, user, onLogout }) {
   const [config, setConfig] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editingMembers, setEditingMembers] = useState(false);
+  const [selectedMember, setSelectedMember] = useState(null);
   const [settingStartDate, setSettingStartDate] = useState(false);
   const [startDateInput, setStartDateInput] = useState({ month: new Date().getMonth() + 1, year: new Date().getFullYear() });
   const [selectedMonth, setSelectedMonth] = useState(null);
@@ -391,7 +393,19 @@ export default function Dashboard({ chitId, onBack, user, onLogout }) {
         </div>
       )}
 
-      {/* ---- STICKY TOP BAR ---- */}
+      {/* ---- MEMBER HISTORY MODAL ---- */}
+      {selectedMember && (
+        <MemberHistory
+          member={selectedMember}
+          config={config}
+          onClose={() => setSelectedMember(null)}
+          BEFORE_AMOUNTS={BEFORE_AMOUNTS}
+          AFTER_AMOUNT={AFTER_AMOUNT}
+          TOTAL_MONTHS={TOTAL_MONTHS}
+        />
+      )}
+
+      {/* ---- STICKY TOP BAR ---- */}}
       <div className="db-topbar">
         <button className="db-back-btn" onClick={onBack}>
           Back to Overview
@@ -564,7 +578,20 @@ export default function Dashboard({ chitId, onBack, user, onLogout }) {
                   return (
                     <tr key={m.id} className={`${rowClass} ${statusClass}`}>
                       <td><strong>{m.id}</strong></td>
-                      <td style={{ textAlign: "left", fontWeight: 500 }}>{m.name}</td>
+                      <td style={{ textAlign: "left" }}>
+                        <button
+                          onClick={() => setSelectedMember(m)}
+                          style={{
+                            background: "none", border: "none", padding: 0,
+                            fontWeight: 600, fontSize: "0.95em", color: "#1E1B4B",
+                            cursor: "pointer", textDecoration: "underline",
+                            textDecorationColor: "#C7D2FE", fontFamily: "inherit",
+                            textAlign: "left",
+                          }}
+                        >
+                          {m.name}
+                        </button>
+                      </td>
                       <td style={{ fontSize: "0.85em" }}>
                         {m.phone ? (
                           <a
