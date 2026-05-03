@@ -28,6 +28,7 @@ export default function Dashboard({ chitId, onBack, user, onLogout }) {
   const [loading, setLoading] = useState(true);
   const [editingMembers, setEditingMembers] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
+  const [reportHtml, setReportHtml] = useState(null);
   const [settingStartDate, setSettingStartDate] = useState(false);
   const [startDateInput, setStartDateInput] = useState({ month: new Date().getMonth() + 1, year: new Date().getFullYear() });
   const [selectedMonth, setSelectedMonth] = useState(null);
@@ -382,9 +383,7 @@ export default function Dashboard({ chitId, onBack, user, onLogout }) {
 </body>
 </html>`;
 
-    const win = window.open("", "_blank");
-    win.document.write(html);
-    win.document.close();
+    setReportHtml(html);
   };
 
   const updateShortPayment = async (member, month, amount) => {
@@ -531,7 +530,57 @@ export default function Dashboard({ chitId, onBack, user, onLogout }) {
         />
       )}
 
-      {/* ---- STICKY TOP BAR ---- */}}
+      {/* ---- REPORT OVERLAY ---- */}
+      {reportHtml && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 600,
+          background: "#fff", display: "flex", flexDirection: "column",
+        }}>
+          <div style={{
+            background: "linear-gradient(135deg, #1E1B4B, #312E81)",
+            padding: "12px 16px",
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            flexShrink: 0,
+          }}>
+            <span style={{ color: "#fff", fontWeight: 700, fontSize: "0.95em" }}>
+              Collection Report
+            </span>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                onClick={() => {
+                  const iframe = document.getElementById("report-iframe");
+                  if (iframe) iframe.contentWindow.print();
+                }}
+                style={{
+                  background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.25)",
+                  color: "#E0E7FF", padding: "6px 14px", borderRadius: 6,
+                  fontSize: "0.82em", fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                }}
+              >
+                Print / PDF
+              </button>
+              <button
+                onClick={() => setReportHtml(null)}
+                style={{
+                  background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)",
+                  color: "#C7D2FE", padding: "6px 14px", borderRadius: 6,
+                  fontSize: "0.82em", fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+          <iframe
+            id="report-iframe"
+            style={{ flex: 1, border: "none", width: "100%", height: "100%" }}
+            srcDoc={reportHtml}
+            title="Collection Report"
+          />
+        </div>
+      )}
+
+      {/* ---- STICKY TOP BAR ---- */}}}
       <div className="db-topbar">
         <button className="db-back-btn" onClick={onBack}>
           Back to Overview
