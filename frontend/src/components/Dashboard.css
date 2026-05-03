@@ -445,3 +445,23 @@ tbody tr:hover td { background: #F8FAFF; }
   .summary { grid-template-columns: 1fr 1fr; gap: 8px; }
   .summary-card strong { font-size: 1.4em; }
 }
+
+/* Sign Out button in topbar */
+.db-logout-btn {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(199,210,254,0.7);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.78em;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.db-logout-btn:hover {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+}
