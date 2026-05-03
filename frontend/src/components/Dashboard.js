@@ -12,7 +12,7 @@ import {
 import { db } from "../firebaseConfig";
 import MemberSetup from "./MemberSetup";
 
-export default function Dashboard({ chitId, onBack }) {
+export default function Dashboard({ chitId, onBack, user, onLogout }) {
 
   const TOTAL_MONTHS = 30;
   const BEFORE_AMOUNTS = [
