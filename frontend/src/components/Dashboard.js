@@ -588,7 +588,7 @@ export default function Dashboard({ chitId, onBack, user, onLogout }) {
         </div>
       )}
 
-      {/* ---- STICKY TOP BAR ---- */}}}
+      {/* ---- STICKY TOP BAR ---- */}
       <div className="db-topbar">
         <button className="db-back-btn" onClick={onBack}>
           Back to Overview
@@ -599,13 +599,6 @@ export default function Dashboard({ chitId, onBack, user, onLogout }) {
           onClick={() => setEditingMembers(true)}
         >
           {selectedMonth === 1 ? "Set Up / Edit Members" : "Edit Members"}
-        </button>
-        <button
-          className="db-logout-btn"
-          onClick={onLogout}
-          title={"Signed in as " + (user?.email || "")}
-        >
-          Sign Out
         </button>
       </div>
 
