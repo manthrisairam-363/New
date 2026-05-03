@@ -145,18 +145,7 @@ export default function Dashboard({ chitId, onBack }) {
     return `${MONTH_NAMES[month]}'${String(year).slice(2)}`;
   };
 
-  // Get correct payment date for a past month
-  const getPaymentDateForMonth = (monthNum) => {
-    if (!config?.startMonth || !config?.startYear) return new Date().toISOString();
-    const totalMonths = config.startMonth - 1 + monthNum - 1;
-    const year = config.startYear + Math.floor(totalMonths / 12);
-    const month = totalMonths % 12;
-    // Use last day of that month
-    const lastDay = new Date(year, month + 1, 0);
-    const today = new Date();
-    // If the month is in the future, use today; otherwise use last day of that month
-    return lastDay > today ? today.toISOString() : lastDay.toISOString();
-  };
+
   const countPaidForMonth = (month) =>
     members.filter((m) => m.payments?.[month]?.paid).length;
 
