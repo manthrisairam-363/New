@@ -504,17 +504,17 @@ export default function Dashboard({ chitId, onBack }) {
             <div className="summary-card">
               <small>Collected This Month</small>
               <strong style={{ color: "var(--success)" }}>Rs.{collected.toLocaleString()}</strong>
-              <span className="sub">Expected: Rs.{totalPerMonth.toLocaleString()}</span>
+              <span className="sub">Incl. dues cleared: Rs.{totalPerMonth.toLocaleString()} expected</span>
             </div>
             <div className="summary-card pending-card">
               <small>Pending This Month</small>
               <strong style={{ color: "var(--danger)" }}>Rs.{pending.toLocaleString()}</strong>
-              <span className="sub">Current month only</span>
+              <span className="sub">Unpaid members incl. their dues</span>
             </div>
             <div className="summary-card" style={{ background: "#FFF1F2", border: "1px solid #FECDD3" }}>
               <small style={{ color: "#9F1239" }}>Total Outstanding</small>
               <strong style={{ color: "#BE123C" }}>Rs.{totalOutstanding.toLocaleString()}</strong>
-              <span className="sub">All months combined</span>
+              <span className="sub">All dues across all months</span>
             </div>
           </div>
 
