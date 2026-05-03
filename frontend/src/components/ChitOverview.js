@@ -8,7 +8,7 @@ import AddChitModal from "./AddChitModal";
 // Fallback hardcoded IDs for existing chits (migrated to Firestore on first load)
 const LEGACY_IDS = ["2025", "2026", "1992", "2434", "1116"];
 
-const ChitOverview = ({ onSelectChit }) => {
+const ChitOverview = ({ onSelectChit, user, onLogout }) => {
   const [chits, setChits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -101,6 +101,27 @@ const ChitOverview = ({ onSelectChit }) => {
         <div className="overview-page-header">
           <h2 className="overview-main-title">Chit Fund Management Dashboard</h2>
           <p className="overview-subtitle">Chitt Tracker · {chits.length} funds</p>
+          <div style={{ marginTop: 10 }}>
+            <span style={{ fontSize: "0.78em", color: "rgba(196,181,253,0.6)", marginRight: 10 }}>
+              {user?.email}
+            </span>
+            <button
+              onClick={onLogout}
+              style={{
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                color: "rgba(196,181,253,0.8)",
+                padding: "5px 14px",
+                borderRadius: 6,
+                fontSize: "0.78em",
+                cursor: "pointer",
+                fontFamily: "inherit",
+                fontWeight: 500,
+              }}
+            >
+              Sign Out
+            </button>
+          </div>
         </div>
 
         {/* Add New Chit Button */}
