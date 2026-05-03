@@ -100,7 +100,7 @@ const ChitOverview = ({ onSelectChit, user, onLogout }) => {
       <div className="chit-overview">
         <div className="overview-page-header">
           <h2 className="overview-main-title">Chit Fund Management Dashboard</h2>
-          <p className="overview-subtitle">Chitt Tracker · {chits.length} funds</p>
+          <p className="overview-subtitle">Chitt Tracker - {chits.length} funds</p>
           <div style={{ marginTop: 10 }}>
             <span style={{ fontSize: "0.78em", color: "rgba(196,181,253,0.6)", marginRight: 10 }}>
               {user?.email}
@@ -187,7 +187,7 @@ const ChitOverview = ({ onSelectChit, user, onLogout }) => {
                       </div>
                     </div>
 
-                    <button className="manage-btn">Manage This Chit →</button>
+                    <button className="manage-btn">Manage This Chit -></button>
                   </div>
                 </div>
               );
