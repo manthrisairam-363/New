@@ -701,7 +701,7 @@ export default function Dashboard({ chitId, onBack, user, onLogout }) {
         );
       })()}
 
-      {/* ---- STICKY TOP BAR ---- */}}
+      {/* ---- STICKY TOP BAR ---- */}
       <div className="db-topbar">
         <button className="db-back-btn" onClick={onBack}>
           Back to Overview
