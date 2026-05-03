@@ -394,6 +394,31 @@ export default function Dashboard({ chitId, onBack, user, onLogout }) {
     setReportHtml(html);
   };
 
+  // ---- SEND ALL REMINDERS ----
+  const sendAllReminders = () => {
+    const unpaidMembers = members.filter(
+      (m) => !(m.payments?.[selectedMonth]?.paid) && m.phone
+    );
+    if (unpaidMembers.length === 0) {
+      showToast("All members have paid this month!", "success");
+      return;
+    }
+    // Open WhatsApp for each unpaid member one by one
+    unpaidMembers.forEach((m, idx) => {
+      const amount = getMemberPaymentAmount(m, selectedMonth);
+      const totalDue = getMemberDueAmount(m, selectedMonth);
+      const prevDue = selectedMonth > 1 ? getMemberDueAmount(m, selectedMonth - 1) : 0;
+      const msg = encodeURIComponent(
+        prevDue > 0
+          ? `Hi ${m.name}, your chit payments are pending. Total due: Rs.${totalDue.toLocaleString()} (includes previous unpaid months + ${getMonthLabel(selectedMonth)}). Kindly pay at the earliest. Thank you! - Chitt Tracker`
+          : `Hi ${m.name}, your chit payment for ${getMonthLabel(selectedMonth)} (Rs.${amount.toLocaleString()}) is pending. Kindly pay at the earliest. Thank you! - Chitt Tracker`
+      );
+      const url = `https://wa.me/91${m.phone}?text=${msg}`;
+      setTimeout(() => window.open(url, "_blank"), idx * 800);
+    });
+    showToast(`Sending reminders to ${unpaidMembers.length} members...`);
+  };
+
   const updateShortPayment = async (member, month, amount) => {
     try {
       const updatedShortPayments = { ...member.shortPayments, [month]: amount };
@@ -727,23 +752,42 @@ export default function Dashboard({ chitId, onBack, user, onLogout }) {
         <div className="table-card">
           <div className="table-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h3>Payment Tracking - {getMonthLabel(selectedMonth)}</h3>
-            <button
-              onClick={generateReport}
-              style={{
-                background: "rgba(255,255,255,0.15)",
-                border: "1px solid rgba(255,255,255,0.25)",
-                color: "#E0E7FF",
-                padding: "5px 14px",
-                borderRadius: 6,
-                fontSize: "0.8em",
-                fontWeight: 600,
-                cursor: "pointer",
-                fontFamily: "inherit",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Export Report
-            </button>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                onClick={sendAllReminders}
+                style={{
+                  background: "rgba(251,191,36,0.2)",
+                  border: "1px solid rgba(251,191,36,0.35)",
+                  color: "#FCD34D",
+                  padding: "5px 14px",
+                  borderRadius: 6,
+                  fontSize: "0.8em",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Remind All Unpaid
+              </button>
+              <button
+                onClick={generateReport}
+                style={{
+                  background: "rgba(255,255,255,0.15)",
+                  border: "1px solid rgba(255,255,255,0.25)",
+                  color: "#E0E7FF",
+                  padding: "5px 14px",
+                  borderRadius: 6,
+                  fontSize: "0.8em",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Export Report
+              </button>
+            </div>
           </div>
           <div className="table-wrap">
             <table>
