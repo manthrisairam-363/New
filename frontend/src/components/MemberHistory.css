@@ -1,0 +1,170 @@
+/* MemberHistory.css */
+
+.mh-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  padding: 20px;
+}
+
+.mh-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  overflow: hidden;
+}
+
+/* Header */
+.mh-header {
+  background: linear-gradient(135deg, #1E1B4B 0%, #312E81 100%);
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.mh-name {
+  font-size: 1.15em;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 2px;
+}
+
+.mh-phone {
+  font-size: 0.82em;
+  color: rgba(196,181,253,0.7);
+}
+
+.mh-close {
+  background: rgba(255,255,255,0.12);
+  border: none;
+  color: #C7D2FE;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: inherit;
+}
+.mh-close:hover { background: rgba(255,255,255,0.22); }
+
+/* Summary pills */
+.mh-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 14px 16px;
+  background: #F8FAFF;
+  border-bottom: 1px solid #E2E8F0;
+  flex-shrink: 0;
+}
+
+.mh-pill {
+  border-radius: 10px;
+  padding: 10px 8px;
+  text-align: center;
+  border: 1px solid;
+}
+
+.mh-pill-green  { background: #F0FDF4; border-color: #BBF7D0; }
+.mh-pill-red    { background: #FFF1F2; border-color: #FECDD3; }
+.mh-pill-blue   { background: #EFF6FF; border-color: #BFDBFE; }
+.mh-pill-orange { background: #FFF7ED; border-color: #FED7AA; }
+
+.mh-pill-val {
+  display: block;
+  font-size: 0.95em;
+  font-weight: 800;
+  color: #1E293B;
+  line-height: 1.2;
+}
+
+.mh-pill-label {
+  display: block;
+  font-size: 0.65em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6B7280;
+  margin-top: 2px;
+}
+
+/* Month list */
+.mh-list {
+  overflow-y: auto;
+  flex: 1;
+  padding: 8px 0;
+}
+
+.mh-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 18px;
+  border-bottom: 1px solid #F1F5F9;
+  transition: background 0.1s;
+}
+.mh-row:last-child { border-bottom: none; }
+.mh-row-paid { background: #F0FDF4; }
+.mh-row-unpaid { background: #FFF1F2; }
+.mh-row-future { background: #FAFAFA; opacity: 0.5; }
+
+.mh-row-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mh-status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-green { background: #059669; }
+.dot-red   { background: #DC2626; }
+.dot-grey  { background: #CBD5E1; }
+
+.mh-month-label {
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #1E293B;
+}
+
+.mh-date {
+  font-size: 0.75em;
+  color: #6B7280;
+  margin-top: 1px;
+}
+
+.mh-overdue { color: #DC2626; font-weight: 600; }
+
+.mh-row-right { text-align: right; }
+
+.mh-amount {
+  font-size: 0.9em;
+  font-weight: 700;
+  color: #1E293B;
+}
+
+.mh-short {
+  font-size: 0.72em;
+  color: #F59E0B;
+  margin-top: 1px;
+}
+
+@media (max-width: 480px) {
+  .mh-summary { grid-template-columns: repeat(2, 1fr); }
+  .mh-card { max-height: 90vh; }
+}
