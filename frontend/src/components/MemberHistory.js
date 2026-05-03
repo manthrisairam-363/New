@@ -28,7 +28,6 @@ export default function MemberHistory({ member, config, onClose, BEFORE_AMOUNTS,
   const months = [];
   let totalPaid = 0;
   let totalDue = 0;
-  let totalShort = 0;
 
   for (let m = 1; m <= TOTAL_MONTHS; m++) {
     const payment = member.payments?.[m] || {};
@@ -38,7 +37,6 @@ export default function MemberHistory({ member, config, onClose, BEFORE_AMOUNTS,
 
     if (payment.paid) totalPaid += amount - short;
     else if (!isFuture) totalDue += amount + short;
-    if (short > 0) totalShort += short;
 
     months.push({
       num: m,
