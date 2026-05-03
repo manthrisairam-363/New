@@ -261,6 +261,132 @@ export default function Dashboard({ chitId, onBack, user, onLogout }) {
     }
   };
 
+  // ---- GENERATE PDF REPORT ----
+  const generateReport = () => {
+    const monthLabel = getMonthLabel(selectedMonth);
+    const chitName = config?.chitName || `Chit ${chitId}`;
+    const today = new Date().toLocaleDateString();
+
+    const rows = members.map((m, idx) => {
+      const paid = m.payments?.[selectedMonth]?.paid || false;
+      const paidDate = m.payments?.[selectedMonth]?.date;
+      const amount = getMemberPaymentAmount(m, selectedMonth);
+      const totalDue = getMemberDueAmount(m, selectedMonth);
+      const short = m.shortPayments?.[selectedMonth] || 0;
+      const receiver = m.chitMonthPicked ? `Month ${m.chitMonthPicked}` : "-";
+      const statusColor = paid ? "#059669" : "#DC2626";
+      const rowBg = idx % 2 === 0 ? "#ffffff" : "#f9fafb";
+      return `
+        <tr style="background:${rowBg}">
+          <td>${m.id}</td>
+          <td style="font-weight:600">${m.name}</td>
+          <td>${m.phone || "-"}</td>
+          <td>${receiver}</td>
+          <td>Rs.${amount.toLocaleString()}</td>
+          <td style="color:${statusColor};font-weight:700">${paid ? "Paid" : "Pending"}</td>
+          <td>${paid && paidDate ? new Date(paidDate).toLocaleDateString() : "-"}</td>
+          <td style="color:${totalDue > 0 ? "#DC2626" : "#059669"};font-weight:600">Rs.${totalDue.toLocaleString()}</td>
+          <td>${short > 0 ? "Rs." + short.toLocaleString() : "-"}</td>
+        </tr>`;
+    }).join("");
+
+    const totalCollected = members.reduce((sum, m) => {
+      if (!m.payments?.[selectedMonth]?.paid) return sum;
+      let memberTotal = 0;
+      for (let mo = 1; mo <= selectedMonth; mo++) {
+        if (m.payments?.[mo]?.paid) memberTotal += getMemberPaymentAmount(m, mo);
+      }
+      return sum + memberTotal;
+    }, 0);
+    const totalPending = members.reduce((sum, m) => {
+      if (m.payments?.[selectedMonth]?.paid) return sum;
+      return sum + getMemberDueAmount(m, selectedMonth);
+    }, 0);
+    const paidCount = members.filter(m => m.payments?.[selectedMonth]?.paid).length;
+    const receiver = members.find(m => m.chitMonthPicked === selectedMonth);
+
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>${chitName} - ${monthLabel} Report</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: Arial, sans-serif; padding: 32px; color: #1e293b; font-size: 13px; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; border-bottom: 3px solid #1E1B4B; padding-bottom: 16px; }
+    .logo { font-size: 28px; font-weight: 900; color: #1E1B4B; }
+    .logo span { color: #F59E0B; }
+    .report-meta { text-align: right; }
+    .report-meta h2 { font-size: 16px; font-weight: 700; color: #1E1B4B; }
+    .report-meta p { font-size: 11px; color: #6b7280; margin-top: 3px; }
+    .summary { display: flex; gap: 12px; margin-bottom: 20px; }
+    .summary-box { flex: 1; background: #f8faff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; }
+    .summary-box .val { font-size: 18px; font-weight: 800; color: #1E1B4B; }
+    .summary-box .lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; color: #6b7280; margin-top: 3px; letter-spacing: 0.05em; }
+    .summary-box.green .val { color: #059669; }
+    .summary-box.red .val { color: #DC2626; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    thead tr { background: #1E1B4B; }
+    th { padding: 9px 10px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #C7D2FE; }
+    td { padding: 9px 10px; font-size: 12px; border-bottom: 1px solid #f1f5f9; }
+    .footer { text-align: center; font-size: 10px; color: #9ca3af; margin-top: 20px; padding-top: 12px; border-top: 1px solid #e2e8f0; }
+    @media print { body { padding: 16px; } .no-print { display: none; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">Chitt<span>Tracker</span></div>
+    <div class="report-meta">
+      <h2>${chitName} - ${monthLabel} Collection Report</h2>
+      <p>Generated on ${today}</p>
+      ${receiver ? `<p>Chit Receiver: <strong>${receiver.name}</strong></p>` : ""}
+    </div>
+  </div>
+
+  <div class="summary">
+    <div class="summary-box">
+      <div class="val">${paidCount} / ${members.length}</div>
+      <div class="lbl">Members Paid</div>
+    </div>
+    <div class="summary-box green">
+      <div class="val">Rs.${totalCollected.toLocaleString()}</div>
+      <div class="lbl">Total Collected</div>
+    </div>
+    <div class="summary-box red">
+      <div class="val">Rs.${totalPending.toLocaleString()}</div>
+      <div class="lbl">Total Pending</div>
+    </div>
+    <div class="summary-box">
+      <div class="val">Rs.${(totalCollected + totalPending).toLocaleString()}</div>
+      <div class="lbl">Total Expected</div>
+    </div>
+  </div>
+
+  <button class="no-print" onclick="window.print()" style="margin-bottom:16px;background:#1E1B4B;color:white;border:none;padding:8px 20px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">
+    Print / Save as PDF
+  </button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>#</th><th>Name</th><th>Phone</th><th>Chit Picked</th>
+        <th>Amount</th><th>Status</th><th>Paid On</th><th>Total Due</th><th>Short Paid</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>
+
+  <div class="footer">
+    ChittTracker - Chit Fund Management App &nbsp;|&nbsp; ${chitName} &nbsp;|&nbsp; ${monthLabel} &nbsp;|&nbsp; Generated ${today}
+  </div>
+</body>
+</html>`;
+
+    const win = window.open("", "_blank");
+    win.document.write(html);
+    win.document.close();
+  };
+
   const updateShortPayment = async (member, month, amount) => {
     try {
       const updatedShortPayments = { ...member.shortPayments, [month]: amount };
@@ -549,8 +675,25 @@ export default function Dashboard({ chitId, onBack, user, onLogout }) {
 
         {/* ---- PAYMENTS TABLE ---- */}
         <div className="table-card">
-          <div className="table-card-header">
+          <div className="table-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h3>Payment Tracking - {getMonthLabel(selectedMonth)}</h3>
+            <button
+              onClick={generateReport}
+              style={{
+                background: "rgba(255,255,255,0.15)",
+                border: "1px solid rgba(255,255,255,0.25)",
+                color: "#E0E7FF",
+                padding: "5px 14px",
+                borderRadius: 6,
+                fontSize: "0.8em",
+                fontWeight: 600,
+                cursor: "pointer",
+                fontFamily: "inherit",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Export Report
+            </button>
           </div>
           <div className="table-wrap">
             <table>
