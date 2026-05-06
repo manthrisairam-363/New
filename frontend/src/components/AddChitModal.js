@@ -31,12 +31,13 @@ export default function AddChitModal({ onClose, onAdded }) {
   const handleSave = async () => {
     const name = chitName.trim();
     if (!name) { setError("Please enter a chit name or ID."); return; }
-    if (!/^[a-zA-Z0-9_\- ]+$/.test(name)) {
-      setError("Name can only contain letters, numbers, spaces, - and _");
+    if (/[/\\.]/.test(name)) {
+      setError("Name cannot contain / \\ or . characters.");
       return;
     }
 
-    const chitId = name.replace(/\s+/g, "_");
+    // Generate safe Firestore ID - keep letters (including Telugu), replace spaces
+    const chitId = name.trim().replace(/\s+/g, "_").replace(/[^\w\u0C00-\u0C7F_-]/g, "_");
     setSaving(true);
     setError("");
 
@@ -127,11 +128,11 @@ export default function AddChitModal({ onClose, onAdded }) {
           </div>
 
           <div className="modal-preview">
-            <div className="modal-preview-icon">ℹ</div>
+            <div className="modal-preview-icon">i</div>
             <div>
               <div className="modal-preview-title">
                 {MONTHS[startMonth - 1]} {startYear} start
-                {" → "}Currently on <strong>Month {previewMonth}</strong>
+                {" -> "}Currently on <strong>Month {previewMonth}</strong>
               </div>
               <div className="modal-preview-sub">
                 The app will automatically track which month the chit is on based on today's date.
